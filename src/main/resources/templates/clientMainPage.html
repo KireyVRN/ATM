@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>PersonalPage</title>
+</head>
+<body>
+<p th:text="'Привет ' + ${client.name}">Hello message</p>
+<table th:object="${client}">
+    <tr th:each="card : ${client.cards}">
+        <td th:text="${card.cardNumber}">CardNumber</td>
+        <td th:text=${card.balance}>Balance</td>
+        <td>
+            <form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}}">
+                <input type="submit" value="Information"/>
+            </form>
+            <!--            <a th:href="@{'/client/'+${client.id}+'/card'+${card.id}}">Information</a>-->
+        </td>
+    </tr>
+</table>
+</body>
+</html>

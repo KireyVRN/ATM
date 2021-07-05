@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>WithdrawPage</title>
+</head>
+<body>
+
+<p>Введите сумму</p>
+<form th:method="PUT" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/withdraw'}" th:object="${operation}">
+    <label for="amountOfMoney"> Сумма </label>
+    <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+    <br/>
+    <!--    <label for="age"> Возраст: </label>-->
+    <!--    <input type="text" th:field="*{age}" id="age"/>-->
+    <!--    <div style="color:blue" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">Error</div>-->
+    <!--    <br/>-->
+    <button type="submit">Снять</button>
+</form>
+
+<!--<form class="login-form" method="post" th:action="@{'/client/'+${client.id}+'/card'+${card.id}}" th:object="${user}">-->
+<!--    <input type="text" id="username" name="username" placeholder="Пользователь"/>-->
+<!--    <input type="password" id="password" name="password" placeholder="Пароль"/>-->
+<!--    <button type="submit">Войти</button>-->
+<!--    <p class="message"><a href="/authorization/newUser">Регистрация</a></p>-->
+<!--</form>-->
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Card</title>
+</head>
+<body>
+
+<p th:text="'Номер карты ' + ${card.cardNumber}">CardNumber</p>
+
+<p>Expire Date</p>
+
+<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/transfer'}">
+    <input type="submit" value="Перевод"/>
+</form>
+
+<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/deposit'}">
+    <input type="submit" value="Пополнить счет"/>
+</form>
+
+<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/withdraw'}">
+    <input type="submit" value="Снять наличные"/>
+</form>
+
+<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/pin'}">
+    <input type="submit" value="Изменить PIN"/>
+</form>
+
+<form th:method="DELETE" th:action="@{'/client/'+${client.id}+'/card'+${card.id}}">
+    <input type="submit" value="Заблокировать карту"/>
+</form>
+
+</body>
+</html>

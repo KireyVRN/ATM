@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Pin</title>
+</head>
+<body>
+
+<p th:text="'PIN ' + ${card.pin}"> PIN </p>
+
+<br/>
+
+<form th:method="PUT" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/pin'}" th:object="${card}">
+
+    <label for="pin"> New PIN </label>
+    <input th:type="number" th:field="*{pin}" id="pin"/>
+
+    <br/>
+    <button type="submit">Изменить</button>
+
+</form>
+
+</body>
+</html>

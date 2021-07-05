@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Deposit</title>
+</head>
+<body>
+
+<p>Положите деньги в купюроприемник</p>
+
+<form th:method="PUT" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/deposit'}" th:object="${operation}">
+    <label for="amountOfMoney"> Сумма </label>
+    <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+    <br/>
+
+    <button type="submit">Положить</button>
+</form>
+
+</body>
+</html>

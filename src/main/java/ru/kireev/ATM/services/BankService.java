@@ -38,17 +38,23 @@ public class BankService {
         return operationRepository.findAll();
     }
 
+    public void updateCard(Card card) {
+
+        cardRepository.saveAndFlush(card);
+
+    }
+
     public Client getClientById(long id) {
 
         return clientRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Такого пользователя не существует!"));
 
     }
 
-    public Card getCardById(long id) {
-
-        return cardRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Такой карты не существует!"));
-
-    }
+//    public Card getCardById(long id) {
+//
+//        return cardRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Такой карты не существует!"));
+//
+//    }
 
     public Card getCardByNumber(int cardNumber) {
 
@@ -83,17 +89,10 @@ public class BankService {
 
     public void transferMoney(Card cardFrom, Card cardTo, BigDecimal amountOfMoney) {
 
-        cardFrom.setBalance(cardTo.getBalance().subtract(amountOfMoney));
+        cardFrom.setBalance(cardFrom.getBalance().subtract(amountOfMoney));
         cardTo.setBalance(cardTo.getBalance().add(amountOfMoney));
         cardRepository.save(cardFrom);
         cardRepository.save(cardTo);
-
-    }
-
-    public void changePin(Card card, int pin) {
-
-        card.setPin(pin);
-        cardRepository.saveAndFlush(card);
 
     }
 

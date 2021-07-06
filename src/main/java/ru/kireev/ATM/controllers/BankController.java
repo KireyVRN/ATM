@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import ru.kireev.ATM.entities.Card;
 import ru.kireev.ATM.entities.Client;
 import ru.kireev.ATM.entities.Operation;
@@ -17,8 +18,7 @@ import java.util.*;
 @Controller
 @RequestMapping()
 @RequiredArgsConstructor
-@SessionAttributes("client")
-//@SessionAttributes(value = {"client","cards"})
+@SessionAttributes(value = {"client", "card"})
 public class BankController {
 
     private final BankService bankService;
@@ -28,10 +28,7 @@ public class BankController {
     public String clientInformation(@PathVariable("clientId") long id, Model model) {
 
         Client client = bankService.getClientById(id);
-        Set<Card> cards = client.getCards();
-
         model.addAttribute("client", client);
-        //model.addAttribute("cards", cards);
 
         System.out.println("ГЛАВНАЯ " + client);
         return "clientMainPage";
@@ -71,8 +68,7 @@ public class BankController {
 
     @GetMapping("/client/{clientId}/card{cardId}/block")
     public String blockedCardPage(@PathVariable("clientId") long clientId,
-                                  @PathVariable("cardId") long cardId,
-                                  Model model) {
+                                  @PathVariable("cardId") long cardId) {
 
         return "blockedCardPage";
 
@@ -80,15 +76,11 @@ public class BankController {
 
     //ВЫВОД ДЕНЕГ
     @GetMapping("/client/{clientId}/card{cardId}/withdraw")
-    public String withdraw(@PathVariable("clientId") long clientId,
-                           @PathVariable("cardId") long cardId,
-                           Model model) {
+    public String withdraw(
+            @PathVariable("clientId") long clientId,
+            @PathVariable("cardId") long cardId,
+            Model model) {
 
-        Card card = bankService.getCardById(cardId);
-
-        model.addAttribute("card", card);
-
-        //Operation operation = new Operation().setAmountOfMoney("0");
         model.addAttribute("operation", new Operation());
 
         return "withdrawPage";
@@ -96,18 +88,19 @@ public class BankController {
     }
 
     @PutMapping("/client/{clientId}/card{cardId}/withdraw")
-    public String withdrawMoney(@ModelAttribute("operation") Operation operation,
+    public String withdrawMoney(@ModelAttribute("card") Card card,
+                                @ModelAttribute("operation") Operation operation,
                                 @PathVariable("clientId") long clientId,
                                 @PathVariable("cardId") long cardId,
-                                Model model) {
+                                Model model,
+                                SessionStatus sessionStatus) {
 
-        System.out.println("MONEY TO WITHDRAW - " + operation.getAmountOfMoney());
-
-        Card card = bankService.getCardById(cardId);
         bankService.withdrawMoney(card, new BigDecimal(operation.getAmountOfMoney()));
-
         operation.setOperationType(OperationType.WITHDRAWAL).setFromCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now());
         bankService.saveOperation(operation);
+        sessionStatus.setComplete();
+
+        System.out.println("MONEY TO WITHDRAW - " + operation.getAmountOfMoney());
 
         return "redirect:/client/" + clientId;
 
@@ -119,8 +112,6 @@ public class BankController {
                           @PathVariable("cardId") long cardId,
                           Model model) {
 
-        Card card = bankService.getCardById(cardId);
-        model.addAttribute("card", card);
         model.addAttribute("operation", new Operation());
 
         return "depositPage";
@@ -128,30 +119,29 @@ public class BankController {
     }
 
     @PutMapping("/client/{clientId}/card{cardId}/deposit")
-    public String addMoney(@ModelAttribute("operation") Operation operation,
+    public String addMoney(@ModelAttribute("card") Card card,
+                           @ModelAttribute("operation") Operation operation,
                            @PathVariable("clientId") long clientId,
-                           @PathVariable("cardId") long cardId) {
+                           @PathVariable("cardId") long cardId,
+                           SessionStatus sessionStatus) {
 
-        System.out.println("MONEY TO ADD - " + operation.getAmountOfMoney());
-
-
-        Card card = bankService.getCardById(cardId);
         bankService.putMoneyIntoAccount(card, new BigDecimal(operation.getAmountOfMoney()));
-
         operation.setOperationType(OperationType.DEPOSIT).setToCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now());
         bankService.saveOperation(operation);
+        sessionStatus.setComplete();
+
+        System.out.println("MONEY TO ADD - " + operation.getAmountOfMoney());
 
         return "redirect:/client/" + clientId;
 
     }
 
+    //ПЕРЕВЕСТИ ДЕНЬГИ
     @GetMapping("/client/{clientId}/card{cardId}/transfer")
     public String transfer(@PathVariable("clientId") long clientId,
                            @PathVariable("cardId") long cardId,
                            Model model) {
 
-        Card card = bankService.getCardById(cardId);
-        model.addAttribute("card", card);
         model.addAttribute("operation", new Operation());
 
         return "transferPage";
@@ -159,47 +149,48 @@ public class BankController {
     }
 
     @PutMapping("/client/{clientId}/card{cardId}/transfer")
-    public String transferMoney(@ModelAttribute("operation") Operation operation,
+    public String transferMoney(@ModelAttribute("card") Card cardFrom,
+                                @ModelAttribute("operation") Operation operation,
                                 @PathVariable("clientId") long clientId,
-                                @PathVariable("cardId") long cardId) {
+                                @PathVariable("cardId") long cardId,
+                                SessionStatus sessionStatus) {
 
-        Card cardFrom = bankService.getCardById(cardId);
         Card cardTo = bankService.getCardByNumber(operation.getToCard());
-
-        System.out.println("MONEY TO TRANSFER - " + operation.getAmountOfMoney() + " TO CLIENT: " + cardTo.getCardNumber());
-
         bankService.transferMoney(cardFrom, cardTo, new BigDecimal(operation.getAmountOfMoney()));
+        bankService.saveOperation(operation
+                .setOperationType(OperationType.TRANSFER)
+                .setToCard(cardTo.getCardNumber())
+                .setFromCard(cardFrom.getCardNumber())
+                .setDateAndTime(LocalDateTime.now()));
 
-        operation.setOperationType(OperationType.TRANSFER).setToCard(cardTo.getCardNumber()).setFromCard(cardFrom.getCardNumber()).setDateAndTime(LocalDateTime.now());
-        bankService.saveOperation(operation);
+        sessionStatus.setComplete();
+
+        System.out.println("MONEY TO TRANSFER - " + operation.getAmountOfMoney() + " TO CLIENT: " + cardTo.getCardNumber() + "FROM CLIENT " + cardFrom.getCardNumber());
 
         return "redirect:/client/" + clientId;
 
     }
 
+    //ИЗМЕНИТЬ ПИН КОД
     @GetMapping("/client/{clientId}/card{cardId}/pin")
     public String pin(@PathVariable("clientId") long clientId,
                       @PathVariable("cardId") long cardId,
                       Model model) {
-
-        Card card = bankService.getCardById(cardId);
-        model.addAttribute("card", card);
-        //model.addAttribute("operation", new Operation());
 
         return "changePinPage";
 
     }
 
     @PutMapping("/client/{clientId}/card{cardId}/pin")
-    public String changePin(@ModelAttribute("card") Card newPin,
+    public String changePin(@ModelAttribute("card") Card cardWithNewPin,
                             @PathVariable("clientId") long clientId,
-                            @PathVariable("cardId") long cardId) {
+                            @PathVariable("cardId") long cardId,
+                            SessionStatus sessionStatus) {
 
+        bankService.updateCard(cardWithNewPin);
+        sessionStatus.setComplete();
 
-        Card card = bankService.getCardById(cardId);
-        bankService.changePin(card, newPin.getPin());
-
-        System.out.println("КАРТА" + card.getCardNumber() + "PIN CHANGED - " + card.getPin());
+        System.out.println("КАРТА " + cardWithNewPin.getCardNumber() + " PIN CHANGED - " + cardWithNewPin.getPin());
 
         return "redirect:/client/" + clientId;
 

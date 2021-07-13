@@ -12,7 +12,7 @@ import java.time.LocalTime;
 
 @Entity
 @Data
-@Table(name = "operation")
+@Table(name = "operations")
 @Accessors(chain = true)
 @ToString
 @EqualsAndHashCode()
@@ -22,20 +22,24 @@ public class Operation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "operationType")
+    @Column(name = "operation_type")
     //@Enumerated(value = EnumType.STRING)
     private OperationType operationType;
 
-    @Column(name = "amountOfMoney")
+    @Column(name = "amount_of_money")
     private String amountOfMoney;
 
-    @Column(name = "fromCard")
+    @Column(name = "from_card")
     private int fromCard;
 
-    @Column(name = "toCard")
+    @Column(name = "to_card")
     private int toCard;
 
-    @Column(name = "dateAndTime")
+    @Column(name = "date_and_time")
     private LocalDateTime dateAndTime;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "card_id", referencedColumnName = "id")
+//    private Card card;
 
 }

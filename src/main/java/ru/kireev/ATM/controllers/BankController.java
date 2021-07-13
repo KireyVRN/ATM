@@ -56,11 +56,15 @@ public class BankController {
 
     //БЛОКИРОВКА КАРТ
     @DeleteMapping("/client/{clientId}/card{cardId}")
-    public String blockCard(@PathVariable("clientId") long clientId,
+    public String blockCard(@ModelAttribute("card") Card card,
+                            @PathVariable("clientId") long clientId,
                             @PathVariable("cardId") long cardId,
                             Model model) {
 
-        bankService.blockCard(cardId);
+        //bankService.blockCard(cardId);
+        bankService.blockCard(card);
+
+        System.out.println("КАРТА " + card + " ЗАБЛОКИРОВАНА");
 
         return "redirect:/client/" + clientId + "/card" + cardId + "/block";
 
@@ -96,11 +100,10 @@ public class BankController {
                                 SessionStatus sessionStatus) {
 
         bankService.withdrawMoney(card, new BigDecimal(operation.getAmountOfMoney()));
-        operation.setOperationType(OperationType.WITHDRAWAL).setFromCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now());
-        bankService.saveOperation(operation);
+        bankService.saveOperation(operation.setOperationType(OperationType.WITHDRAWAL).setFromCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now()));
         sessionStatus.setComplete();
 
-        System.out.println("MONEY TO WITHDRAW - " + operation.getAmountOfMoney());
+        System.out.println("КАРТА " + card + ", ВЫВЕДЕНО СО СЧЕТА - " + operation.getAmountOfMoney());
 
         return "redirect:/client/" + clientId;
 
@@ -126,11 +129,10 @@ public class BankController {
                            SessionStatus sessionStatus) {
 
         bankService.putMoneyIntoAccount(card, new BigDecimal(operation.getAmountOfMoney()));
-        operation.setOperationType(OperationType.DEPOSIT).setToCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now());
-        bankService.saveOperation(operation);
+        bankService.saveOperation(operation.setOperationType(OperationType.DEPOSIT).setToCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now()));
         sessionStatus.setComplete();
 
-        System.out.println("MONEY TO ADD - " + operation.getAmountOfMoney());
+        System.out.println("КАРТА " + card + ", ПОПОЛНЕН СЧЕТ - " + operation.getAmountOfMoney());
 
         return "redirect:/client/" + clientId;
 
@@ -162,10 +164,9 @@ public class BankController {
                 .setToCard(cardTo.getCardNumber())
                 .setFromCard(cardFrom.getCardNumber())
                 .setDateAndTime(LocalDateTime.now()));
-
         sessionStatus.setComplete();
 
-        System.out.println("MONEY TO TRANSFER - " + operation.getAmountOfMoney() + " TO CLIENT: " + cardTo.getCardNumber() + "FROM CLIENT " + cardFrom.getCardNumber());
+        System.out.println("ПЕРЕВОД СРЕДСТВ - " + operation.getAmountOfMoney() + " С КАРТЫ: " + cardTo.getCardNumber() + " НА КАРТУ " + cardFrom.getCardNumber());
 
         return "redirect:/client/" + clientId;
 
@@ -190,7 +191,7 @@ public class BankController {
         bankService.updateCard(cardWithNewPin);
         sessionStatus.setComplete();
 
-        System.out.println("КАРТА " + cardWithNewPin.getCardNumber() + " PIN CHANGED - " + cardWithNewPin.getPin());
+        System.out.println("КАРТА " + cardWithNewPin.getCardNumber() + " ИЗМЕНЕН ПИН КОД - " + cardWithNewPin.getPin());
 
         return "redirect:/client/" + clientId;
 

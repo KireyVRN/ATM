@@ -6,15 +6,15 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
-@Table(name = "client")
+@Data()
+@Table(name = "clients")
 @EqualsAndHashCode(exclude = "cards")
-//@EqualsAndHashCode
 @Accessors(chain = true)
-@ToString
+@ToString(exclude = "cards")
 public class Client {
 
     @Id
@@ -24,11 +24,17 @@ public class Client {
     @Column(name = "name")
     private String name;
 
-//    @OneToMany(mappedBy = "client")
-//    private Set<Card> cards;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private Set<Card> cards;
+
+    public Client addCard(Card card) {
+
+        if (cards == null) cards = new HashSet<>();
+
+        this.cards.add(card);
+        card.setClient(this);
+        return this;
+
+    }
 
 }

@@ -15,7 +15,4 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     Optional<Card> findByCardNumber(int cardNumber);
 
-//    @Query("select c from Card c where c.client.id = :clientId")
-//    public List<Card> findAllByClientId(long clientId);
-
 }

@@ -3,20 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>PersonalPage</title>
+    <link rel="stylesheet" href="/static/atm.css">
 </head>
 <body>
-<p th:text="'Привет ' + ${client.name}">Hello message</p>
-<table th:object="${client}">
-    <tr th:each="card : ${client.cards}">
-        <td th:text="${card.cardNumber}">CardNumber</td>
-        <td th:text=${card.balance}>Balance</td>
-        <td>
-            <form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}}">
-                <input type="submit" value="Information"/>
-            </form>
-            <!--            <a th:href="@{'/client/'+${client.id}+'/card'+${card.id}}">Information</a>-->
-        </td>
-    </tr>
-</table>
+<div>
+
+    <p th:text="${helloMessage}">Hello message</p>
+    <table th:object="${client}">
+        <tr th:each="card : ${client.cards}">
+            <td th:text="${card.cardNumber}">CardNumber</td>
+            <td th:text=${card.balance}>Balance</td>
+            <td>
+                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
+                    <input type="submit" value="Подробнее"/>
+                </form>
+                <!--            <a th:href="@{'/client/'+${client.id}+'/card'+${card.id}}">Information</a>-->
+            </td>
+        </tr>
+    </table>
+
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
+
+</div>
 </body>
 </html>

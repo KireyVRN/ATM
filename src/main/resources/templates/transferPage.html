@@ -3,23 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Transfer</title>
+    <link rel="stylesheet" href="/static/atm.css">
 </head>
 <body>
+<div>
+    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}"
+          th:object="${operation}">
 
-<form th:method="PUT" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/transfer'}" th:object="${operation}">
+        <label for="amountOfMoney"> Сумма </label>
+        <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
 
-    <label for="amountOfMoney"> Сумма </label>
-    <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+        <br/>
 
-    <br/>
+        <label for="toCard"> Получатель </label>
+        <input th:type="number" th:field="*{toCard}" id="toCard"/>
 
-    <label for="toCard"> Получатель </label>
-    <input th:type="number" th:field="*{toCard}" id="toCard"/>
+        <br/>
+        <button type="submit">Отправить</button>
 
-    <br/>
-    <button type="submit">Отправить</button>
+    </form>
 
-</form>
 
+    <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
+        <button type="submit">Назад</button>
+    </form>
+
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
+
+</div>
 </body>
 </html>

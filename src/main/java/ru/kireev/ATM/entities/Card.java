@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name = "cards")
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "roles")
 @Accessors(chain = true)
 @ToString
 public class Card {
@@ -27,7 +28,7 @@ public class Card {
     private int cardNumber;
 
     @Column(name = "pin")
-    private int pin;
+    private String pin;
 
     @Column(name = "balance")
     private BigDecimal balance;
@@ -35,6 +36,12 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "cards_roles",
+            joinColumns = @JoinColumn(name = "card_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
 //    @OneToMany(mappedBy = "card", fetch = FetchType.LAZY)
 //    private LinkedHashSet<Operation> operations;
@@ -48,5 +55,11 @@ public class Card {
 //        return this;
 //
 //    }
+
+    public String getLastNumbers() {
+
+        return "*" + String.valueOf(cardNumber).substring(5);
+
+    }
 
 }

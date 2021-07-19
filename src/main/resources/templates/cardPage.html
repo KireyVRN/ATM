@@ -3,32 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <title>Card</title>
+    <link rel="stylesheet" href="/static/atm.css">
 </head>
 <body>
+<div>
+    <p th:text="'Номер карты ' + ${card.cardNumber}">CardNumber</p>
 
-<p th:text="'Номер карты ' + ${card.cardNumber}">CardNumber</p>
+    <p>Expire Date</p>
 
-<p>Expire Date</p>
+    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}">
+        <input type="submit" value="Перевод"/>
+    </form>
 
-<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/transfer'}">
-    <input type="submit" value="Перевод"/>
-</form>
+    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}">
+        <input type="submit" value="Пополнить счет"/>
+    </form>
 
-<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/deposit'}">
-    <input type="submit" value="Пополнить счет"/>
-</form>
+    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}">
+        <input type="submit" value="Снять наличные"/>
+    </form>
 
-<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/withdraw'}">
-    <input type="submit" value="Снять наличные"/>
-</form>
+    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/pin'}">
+        <input type="submit" value="Изменить PIN"/>
+    </form>
 
-<form th:method="GET" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/pin'}">
-    <input type="submit" value="Изменить PIN"/>
-</form>
+    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/history'}">
+        <input type="submit" value="История операций"/>
+    </form>
 
-<form th:method="DELETE" th:action="@{'/client/'+${client.id}+'/card'+${card.id}}">
-    <input type="submit" value="Заблокировать карту"/>
-</form>
 
+    <form th:method="DELETE" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
+        <input type="submit" value="Заблокировать карту"/>
+    </form>
+
+
+
+
+    <form th:action="@{'/client'}" th:method="GET">
+        <button type="submit">Назад</button>
+    </form>
+
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
+
+
+</div>
 </body>
 </html>

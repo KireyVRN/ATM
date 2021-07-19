@@ -2,20 +2,20 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>WithdrawPage</title>
+    <title>History</title>
     <link rel="stylesheet" href="/static/atm.css">
 </head>
 <body>
 <div>
-    <p>Введите сумму</p>
-    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}"
-          th:object="${operation}">
-        <label for="amountOfMoney"> Сумма </label>
-        <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
-        <br/>
-        <button type="submit">Снять</button>
-    </form>
+    <p>История операций</p>
 
+    <!--    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}" th:object="${operation}">-->
+    <!--        <label for="amountOfMoney"> Сумма </label>-->
+    <!--        <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>-->
+    <!--        <br/>-->
+
+    <!--        <button type="submit">Положить</button>-->
+    <!--    </form>-->
 
     <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
         <button type="submit">Назад</button>

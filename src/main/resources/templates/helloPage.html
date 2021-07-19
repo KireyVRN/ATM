@@ -2,15 +2,13 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Blocking</title>
+    <title>HelloPage</title>
     <link rel="stylesheet" href="/static/atm.css">
 </head>
 <body>
 <div>
-    <p>Карта заблокирована</p>
-    <form th:method="GET" th:action="@{'/client/'}">
-        <input type="submit" value="OK"/>
-    </form>
+    <p>Пожалуйста вставьте карту</p>
+    <a th:href="@{'/login'}">OK</a>
 </div>
 </body>
 </html>

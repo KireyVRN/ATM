@@ -3,22 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Pin</title>
+    <link rel="stylesheet" href="/static/atm.css">
 </head>
 <body>
-
-<p th:text="'PIN ' + ${card.pin}"> PIN </p>
-
-<br/>
-
-<form th:method="PUT" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/pin'}" th:object="${card}">
-
-    <label for="pin"> New PIN </label>
-    <input th:type="number" th:field="*{pin}" id="pin"/>
+<div>
+    <p th:text="'PIN ' + ${card.pin}"> PIN </p>
 
     <br/>
-    <button type="submit">Изменить</button>
 
-</form>
+    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/pin'}" th:object="${card}">
 
+        <label for="pin"> New PIN </label>
+        <input th:type="number" th:field="*{pin}" id="pin"/>
+
+        <br/>
+        <button type="submit">Изменить</button>
+
+    </form>
+
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
+
+
+
+    <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
+        <button type="submit">Назад</button>
+    </form>
+
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
+
+
+</div>
 </body>
 </html>

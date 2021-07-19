@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Deposit</title>
+    <link rel="stylesheet" href="/static/atm.css">
 </head>
 <body>
+<div>
+    <p>Положите деньги в купюроприемник</p>
 
-<p>Положите деньги в купюроприемник</p>
+    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}" th:object="${operation}">
+        <label for="amountOfMoney"> Сумма </label>
+        <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+        <br/>
 
-<form th:method="PUT" th:action="@{'/client/'+${client.id}+'/card'+${card.id}+'/deposit'}" th:object="${operation}">
-    <label for="amountOfMoney"> Сумма </label>
-    <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
-    <br/>
+        <button type="submit">Положить</button>
+    </form>
 
-    <button type="submit">Положить</button>
-</form>
 
+
+    <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
+        <button type="submit">Назад</button>
+    </form>
+
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
+
+</div>
 </body>
 </html>

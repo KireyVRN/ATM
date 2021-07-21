@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Success</title>
+    <link rel="stylesheet" href="/static/atm.css">
+</head>
+<body>
+<div>
+    <p th:text="${message}">Message</p>
+
+    <!--    <form th:method="GET" th:action="@{'/client/'}">-->
+    <!--        <input type="submit" value="OK"/>-->
+    <!--    </form>-->
+    <form th:method="GET" th:action="@{(${currentCard}?'/logoutSuccess':'/client/')}">
+        <input type="submit" value="OK"/>
+    </form>
+
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
+
+</div>
+</body>
+</html>

@@ -8,7 +8,7 @@
 <body>
 <div>
     <p th:text="'Номер карты ' + ${card.cardNumber}">CardNumber</p>
-
+    <p th:text="'Баланс ' + ${card.balance}">CardNumber</p>
     <p>Expire Date</p>
 
     <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}">
@@ -35,8 +35,6 @@
     <form th:method="DELETE" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
         <input type="submit" value="Заблокировать карту"/>
     </form>
-
-
 
 
     <form th:action="@{'/client'}" th:method="GET">

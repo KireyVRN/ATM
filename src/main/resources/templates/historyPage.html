@@ -9,13 +9,11 @@
 <div>
     <p>История операций</p>
 
-    <!--    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}" th:object="${operation}">-->
-    <!--        <label for="amountOfMoney"> Сумма </label>-->
-    <!--        <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>-->
-    <!--        <br/>-->
-
-    <!--        <button type="submit">Положить</button>-->
-    <!--    </form>-->
+    <table th:object="${card}">
+        <tr th:each="operation : ${card.operations}">
+            <td th:text="${operation.getInformationForHistory()}">DateAndTime</td>
+        </tr>
+    </table>
 
     <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
         <button type="submit">Назад</button>

@@ -7,17 +7,14 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
 @Table(name = "cards")
-@EqualsAndHashCode(exclude = "roles")
+@EqualsAndHashCode(exclude = {"operations", "roles"})
 @Accessors(chain = true)
-@ToString
+@ToString(exclude = {"operations", "roles"})
 public class Card {
 
     @Id
@@ -43,22 +40,22 @@ public class Card {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-//    @OneToMany(mappedBy = "card", fetch = FetchType.LAZY)
-//    private LinkedHashSet<Operation> operations;
-//
-//    public Card addOperation(Operation operation) {
-//
-//        if (operations == null) operations = new LinkedHashSet<>();
-//
-//        this.operations.add(operation);
-//        operation.setCard(this);
-//        return this;
-//
-//    }
+    @OneToMany(mappedBy = "card", fetch = FetchType.EAGER)
+    private List<Operation> operations;
+
+    public Card addOperation(Operation operation) {
+
+        if (operations == null) operations = new ArrayList<>();
+
+        this.operations.add(operation);
+        operation.setCard(this);
+        return this;
+
+    }
 
     public String getLastNumbers() {
 
-        return "*" + String.valueOf(cardNumber).substring(5);
+        return String.format("*%s", String.valueOf(cardNumber).substring(5));
 
     }
 

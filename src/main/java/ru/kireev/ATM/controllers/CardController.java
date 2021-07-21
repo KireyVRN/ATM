@@ -3,6 +3,7 @@ package ru.kireev.ATM.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -18,36 +19,21 @@ import ru.kireev.ATM.services.OperationService;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 @Controller
-@RequestMapping()
 @RequiredArgsConstructor
+@RequestMapping("/client/card")
 @SessionAttributes(value = {"client", "card"})
-public class BankController {
+public class CardController {
 
     private final BankService bankService;
     private final CardService cardService;
     private final ClientService clientService;
     private final OperationService operationService;
 
-    @GetMapping("/client")
-    public String clientInformation(Principal principal, Model model) {
-
-        Card card = cardService.findByCardNumber(Integer.parseInt(principal.getName()));
-        System.out.println("Карта авторизации " + card);
-
-        Client client = card.getClient();
-        System.out.println("Клиент " + client);
-
-        model.addAttribute("client", client).addAttribute("helloMessage", helloMessage(client));
-        return "clientMainPage";
-
-    }
-
-    @GetMapping("/client/card/{cardLastNumbers}")
-    public String cardInformation(@ModelAttribute("client") Client client, @PathVariable("cardLastNumbers") String cardLastNumbers, Model model) {
+    @GetMapping("/{cardLastNumbers}")
+    public String cardMenu(@ModelAttribute("client") Client client, @PathVariable("cardLastNumbers") String cardLastNumbers, Model model) {
 
         Card card = client.getCards()
                 .stream()
@@ -62,7 +48,8 @@ public class BankController {
 
     }
 
-    @DeleteMapping("/client/card/{cardLastNumbers}")
+    @Transactional
+    @DeleteMapping("/{cardLastNumbers}")
     public String blockCard(@ModelAttribute("card") Card card, @PathVariable("cardLastNumbers") String cardLastNumbers) {
 
         cardService.blockCard(card);
@@ -72,14 +59,23 @@ public class BankController {
 
     }
 
-    @GetMapping("/client/card/{cardLastNumbers}/block")
-    public String blockedCardPage(@PathVariable("cardLastNumbers") String cardLastNumbers) {
+    @GetMapping("/{cardLastNumbers}/block")
+    public String blockedCardPage(@ModelAttribute(name = "card") Card card, @PathVariable("cardLastNumbers") String cardLastNumbers, Model model, Principal principal) {
 
-        return "blockedCardPage";
+        boolean currentCard = String.valueOf(card.getCardNumber()).equals(principal.getName());
+
+        model.addAttribute("message", "Карта заблокирована").addAttribute("currentCard", currentCard);
+
+        System.out.println(principal.getName());
+
+        return "successfulActionPage";
+
+        //return "redirect:/successfulAction";
 
     }
 
-    @GetMapping("/client/card/{cardLastNumbers}/withdraw")
+
+    @GetMapping("/{cardLastNumbers}/withdraw")
     public String withdraw(@PathVariable("cardLastNumbers") String cardLastNumbers, Model model) {
 
         model.addAttribute("operation", new Operation());
@@ -87,22 +83,31 @@ public class BankController {
 
     }
 
-    @PutMapping("/client/card/{cardLastNumbers}/withdraw")
+    @Transactional
+    @PutMapping("/{cardLastNumbers}/withdraw")
     public String withdrawMoney(@ModelAttribute("card") Card card,
                                 @ModelAttribute("operation") Operation operation,
                                 @PathVariable("cardLastNumbers") String cardLastNumbers,
+                                Model model,
                                 SessionStatus sessionStatus) {
 
         cardService.withdrawMoney(card, new BigDecimal(operation.getAmountOfMoney()));
-        operationService.saveOperation(operation.setOperationType(OperationType.WITHDRAWAL).setFromCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now()));
+        operationService.saveOperation(operation.setOperationType(OperationType.WITHDRAWAL)
+                .setFromCard(card.getCardNumber())
+                .setDateAndTime(LocalDateTime.now())
+                .setCard(card));
+
         sessionStatus.setComplete();
 
+        model.addAttribute("message", "Заберите деньги");
+
         System.out.println("С карты " + card.getCardNumber() + " снято " + operation.getAmountOfMoney());
-        return "redirect:/client/";
+
+        return "successfulActionPage";
 
     }
 
-    @GetMapping("/client/card/{cardLastNumbers}/deposit")
+    @GetMapping("/{cardLastNumbers}/deposit")
     public String deposit(@PathVariable("cardLastNumbers") String cardLastNumbers, Model model) {
 
         model.addAttribute("operation", new Operation());
@@ -110,22 +115,31 @@ public class BankController {
 
     }
 
-    @PutMapping("/client/card/{cardLastNumbers}/deposit")
+    @Transactional
+    @PutMapping("/{cardLastNumbers}/deposit")
     public String addMoney(@ModelAttribute("card") Card card,
                            @ModelAttribute("operation") Operation operation,
                            @PathVariable("cardLastNumbers") String cardLastNumbers,
-                           SessionStatus sessionStatus) {
+                           SessionStatus sessionStatus,
+                           Model model) {
 
         cardService.putMoneyIntoAccount(card, new BigDecimal(operation.getAmountOfMoney()));
-        operationService.saveOperation(operation.setOperationType(OperationType.DEPOSIT).setToCard(card.getCardNumber()).setDateAndTime(LocalDateTime.now()));
+        operationService.saveOperation(operation.setOperationType(OperationType.DEPOSIT)
+                .setToCard(card.getCardNumber())
+                .setDateAndTime(LocalDateTime.now())
+                .setCard(card));
+
         sessionStatus.setComplete();
 
+        model.addAttribute("message", "Баланс карты пополнен");
+
         System.out.println("На карту " + card.getCardNumber() + " положено " + operation.getAmountOfMoney());
-        return "redirect:/client/";
+
+        return "successfulActionPage";
 
     }
 
-    @GetMapping("/client/card/{cardLastNumbers}/transfer")
+    @GetMapping("/{cardLastNumbers}/transfer")
     public String transfer(@PathVariable("cardLastNumbers") String cardLastNumbers, Model model) {
 
         model.addAttribute("operation", new Operation());
@@ -133,67 +147,79 @@ public class BankController {
 
     }
 
-    @PutMapping("/client/card/{cardLastNumbers}/transfer")
+    @Transactional
+    @PutMapping("/{cardLastNumbers}/transfer")
     public String transferMoney(@ModelAttribute("card") Card cardFrom,
                                 @ModelAttribute("operation") Operation operation,
                                 @PathVariable("cardLastNumbers") String cardLastNumbers,
-                                SessionStatus sessionStatus) {
+                                SessionStatus sessionStatus,
+                                Model model) {
 
         Card cardTo = cardService.findByCardNumber(operation.getToCard());
         cardService.transferMoney(cardFrom, cardTo, new BigDecimal(operation.getAmountOfMoney()));
+
         operationService.saveOperation(operation
                 .setOperationType(OperationType.TRANSFER)
-                .setToCard(cardTo.getCardNumber())
                 .setFromCard(cardFrom.getCardNumber())
-                .setDateAndTime(LocalDateTime.now()));
+                .setToCard(cardTo.getCardNumber())
+                .setDateAndTime(LocalDateTime.now())
+                .setCard(cardFrom));
+
+        operationService.saveOperation(new Operation()
+                .setOperationType(OperationType.TRANSFER)
+                .setFromCard(cardFrom.getCardNumber())
+                .setToCard(cardTo.getCardNumber())
+                .setAmountOfMoney(operation.getAmountOfMoney())
+                .setDateAndTime(LocalDateTime.now())
+                .setCard(cardTo));
+
         sessionStatus.setComplete();
 
-        System.out.println("ПЕРЕВОД СРЕДСТВ - " + operation.getAmountOfMoney() + " С КАРТЫ: " + cardTo.getCardNumber() + " НА КАРТУ " + cardFrom.getCardNumber());
-        return "redirect:/client/";
+        model.addAttribute("message", "Перевод выполнен");
+
+        System.out.println("ПЕРЕВОД СРЕДСТВ - " + operation.getAmountOfMoney() + " С КАРТЫ: " + cardFrom.getCardNumber() + " НА КАРТУ " + cardTo.getCardNumber());
+
+        return "successfulActionPage";
 
     }
 
-    @GetMapping("/client/card/{cardLastNumbers}/pin")
+    @GetMapping("/{cardLastNumbers}/pin")
     public String pin(@PathVariable("cardLastNumbers") String cardLastNumbers) {
 
         return "changePinPage";
 
     }
 
-    @PutMapping("/client/card/{cardLastNumbers}/pin")
+    @Transactional
+    @PutMapping("/{cardLastNumbers}/pin")
     public String changePin(@ModelAttribute("card") Card cardWithNewPin,
                             @PathVariable("cardLastNumbers") String cardLastNumbers,
-                            SessionStatus sessionStatus) {
+                            SessionStatus sessionStatus,
+                            Model model) {
 
         cardService.updateCard(cardWithNewPin.setPin(new BCryptPasswordEncoder(12).encode(cardWithNewPin.getPin())));
         sessionStatus.setComplete();
 
+        operationService.saveOperation(new Operation().setOperationType(OperationType.PIN_CHANGE)
+                .setDateAndTime(LocalDateTime.now())
+                .setCard(cardWithNewPin));
+
+        model.addAttribute("message", "Пин-код изменен");
+
         System.out.println("Пин-код карты " + cardWithNewPin.getCardNumber() + " изменен на " + cardWithNewPin.getPin());
-        return "redirect:/client/";
+
+        return "successfulActionPage";
 
     }
 
-    @GetMapping("/client/card/{cardLastNumbers}/history")
-    public String operationHistory() {
+    @GetMapping("/{cardLastNumbers}/history")
+    public String operationHistory(@ModelAttribute(name = "card") Card card, Model model) {
+
+        System.out.println(card.getOperations());
 
         return "historyPage";
 
     }
-
-    private String helloMessage(Client client) {
-
-        int currentHour = LocalTime.now().getHour();
-        String partOfDay;
-
-        if (currentHour > 5 && currentHour <= 11) partOfDay = "Доброе утро";
-        else if (currentHour > 11 && currentHour <= 17) partOfDay = "Добрый день";
-        else if (currentHour > 17 && currentHour <= 23) partOfDay = "Добрый вечер";
-        else partOfDay = "Доброй ночи";
-
-        return partOfDay + ", " + client.getName() + " " + client.getSurname() + "!";
-
-    }
-
 }
 
 

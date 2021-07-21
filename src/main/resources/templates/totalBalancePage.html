@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Total</title>
+  <link rel="stylesheet" href="/static/atm.css">
+</head>
+<body>
+<div>
+
+  <p th:text="${totalBalance}">Balance</p>
+
+
+  <form th:action="@{'/logout'}" th:method="POST">
+    <button type="submit">Завершить обслуживание</button>
+  </form>
+
+</div>
+</body>
+</html>

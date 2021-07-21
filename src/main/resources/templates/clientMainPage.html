@@ -11,8 +11,8 @@
     <p th:text="${helloMessage}">Hello message</p>
     <table th:object="${client}">
         <tr th:each="card : ${client.cards}">
-            <td th:text="${card.cardNumber}">CardNumber</td>
-            <td th:text=${card.balance}>Balance</td>
+            <td th:text="'Карта '+${card.getLastNumbers()}">CardLastNumbers</td>
+            <td th:text="'Баланс '+${card.balance}">Balance</td>
             <td>
                 <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
                     <input type="submit" value="Подробнее"/>
@@ -21,6 +21,10 @@
             </td>
         </tr>
     </table>
+
+    <form th:action="@{'/totalBalance'}" th:method="GET">
+        <button type="submit">Всего средств</button>
+    </form>
 
     <form th:action="@{'/logout'}" th:method="POST">
         <button type="submit">Завершить обслуживание</button>

@@ -14,9 +14,9 @@ import java.util.Set;
 @Entity
 @Data()
 @Table(name = "clients")
-@EqualsAndHashCode(exclude = {"cards", "roles"})
+@EqualsAndHashCode(exclude = "cards")
 @Accessors(chain = true)
-@ToString(exclude = {"cards", "roles"})
+@ToString(exclude = "cards")
 public class Client {
 
     @Id
@@ -31,12 +31,6 @@ public class Client {
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private Set<Card> cards;
-
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(name = "clients_roles",
-//            joinColumns = @JoinColumn(name = "client_id"),
-//            inverseJoinColumns = @JoinColumn(name = "role_id"))
-//    private Collection<Role> roles;
 
     public Client addCard(Card card) {
 

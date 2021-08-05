@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>History</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet" href="/static/atmWithCard.css">
 </head>
 <body>
-<div>
+<div class="screen">
     <p>История операций</p>
 
-    <table th:object="${card}">
-        <tr th:each="operation : ${card.operations}">
-            <td th:text="${operation.getInformationForHistory()}">DateAndTime</td>
-        </tr>
-    </table>
+        <table>
+            <tr th:each="operation : ${history}">
+                <td th:text="${operation.getInformationForHistory()}">DateAndTime</td>
+            </tr>
+        </table>
 
     <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
         <button type="submit">Назад</button>

@@ -1,5 +1,5 @@
 body {
-    background-image: url(../static/atm.png);
+    background-image: url(../static/atmWithCard.png);
     background-size: cover;
     background-repeat: no-repeat;
     }
@@ -11,3 +11,4 @@ body {
     padding-bottom: 10%;
     }
 
+.error { color: red;}

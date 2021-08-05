@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Transfer</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet" href="/static/atmWithCard.css">
 </head>
 <body>
-<div>
-    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}"
-          th:object="${operation}">
+<div class="screen">
+    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}" th:object="${operation}">
 
         <label for="amountOfMoney"> Сумма </label>
         <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+        <div style="color:red" th:if="${#fields.hasErrors('amountOfMoney')}" th:errors="*{amountOfMoney}">Error</div>
 
         <br/>
 
         <label for="toCard"> Получатель </label>
         <input th:type="number" th:field="*{toCard}" id="toCard"/>
+        <div class="error" th:if="${#fields.hasErrors('toCard')}" th:errors="*{toCard}">Error</div>
+
+        <div class="error" th:if="${#fields.hasErrors('global')}">
+            <p th:each="err : ${#fields.errors('global')}" th:text="${err}"/>
+        </div>
 
         <br/>
         <button type="submit">Отправить</button>

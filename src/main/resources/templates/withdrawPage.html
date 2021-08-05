@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>WithdrawPage</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet" href="/static/atmWithCard.css">
 </head>
 <body>
-<div>
-    <p>Введите сумму</p>
-    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}"
-          th:object="${operation}">
-        <label for="amountOfMoney"> Сумма </label>
-        <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
-        <br/>
-        <button type="submit">Снять</button>
-    </form>
+<div class="screen">
 
+    <p>Введите сумму</p>
+
+    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}" th:object="${operation}">
+
+        <label for="amountOfMoney"> Сумма </label>
+        <input th:type="number" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+        <div class="error" th:if="${#fields.hasErrors('amountOfMoney')}" th:errors="*{amountOfMoney}">Error</div>
+        <div class="error" th:if="${#fields.hasErrors('global')}">
+            <p th:each="err : ${#fields.errors('global')}" th:text="${err}"/>
+        </div>
+        <button type="submit">Снять</button>
+
+    </form>
 
     <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
         <button type="submit">Назад</button>

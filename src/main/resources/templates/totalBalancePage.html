@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <title>Total</title>
-  <link rel="stylesheet" href="/static/atm.css">
+    <meta charset="UTF-8">
+    <title>Total</title>
+    <link rel="stylesheet" href="/static/atmWithCard.css">
 </head>
 <body>
-<div>
+<div class="screen">
 
-  <p th:text="${totalBalance}">Balance</p>
+    <p th:text="'Всего средств '+${totalBalance}+' руб'">Balance</p>
 
+    <form th:action="@{'/logout'}" th:method="POST">
+        <button type="submit">Завершить обслуживание</button>
+    </form>
 
-  <form th:action="@{'/logout'}" th:method="POST">
-    <button type="submit">Завершить обслуживание</button>
-  </form>
+    <form th:action="@{'/client'}" th:method="GET">
+        <button type="submit">Назад</button>
+    </form>
 
 </div>
 </body>

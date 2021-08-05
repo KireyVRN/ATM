@@ -3,8 +3,9 @@ package ru.kireev.ATM.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.kireev.ATM.entities.Card;
@@ -16,10 +17,12 @@ import ru.kireev.ATM.services.CardService;
 import ru.kireev.ATM.services.ClientService;
 import ru.kireev.ATM.services.OperationService;
 
-import java.math.BigDecimal;
+import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -48,32 +51,18 @@ public class CardController {
 
     }
 
-    @Transactional
     @DeleteMapping("/{cardLastNumbers}")
-    public String blockCard(@ModelAttribute("card") Card card, @PathVariable("cardLastNumbers") String cardLastNumbers) {
+    public String blockCard(@ModelAttribute("card") Card card, @PathVariable("cardLastNumbers") String cardLastNumbers, Model model, Principal principal) {
 
         cardService.blockCard(card);
 
-        System.out.println("КАРТА " + card.getCardNumber() + " ЗАБЛОКИРОВАНА");
-        return "redirect:/client/card/" + cardLastNumbers + "/block";
-
-    }
-
-    @GetMapping("/{cardLastNumbers}/block")
-    public String blockedCardPage(@ModelAttribute(name = "card") Card card, @PathVariable("cardLastNumbers") String cardLastNumbers, Model model, Principal principal) {
-
         boolean currentCard = String.valueOf(card.getCardNumber()).equals(principal.getName());
-
         model.addAttribute("message", "Карта заблокирована").addAttribute("currentCard", currentCard);
 
-        System.out.println(principal.getName());
-
+        System.out.println("КАРТА " + card.getCardNumber() + " ЗАБЛОКИРОВАНА");
         return "successfulActionPage";
 
-        //return "redirect:/successfulAction";
-
     }
-
 
     @GetMapping("/{cardLastNumbers}/withdraw")
     public String withdraw(@PathVariable("cardLastNumbers") String cardLastNumbers, Model model) {
@@ -83,15 +72,28 @@ public class CardController {
 
     }
 
-    @Transactional
     @PutMapping("/{cardLastNumbers}/withdraw")
     public String withdrawMoney(@ModelAttribute("card") Card card,
-                                @ModelAttribute("operation") Operation operation,
+                                @ModelAttribute("operation") @Valid Operation operation,
+                                BindingResult bindingResult,
                                 @PathVariable("cardLastNumbers") String cardLastNumbers,
                                 Model model,
                                 SessionStatus sessionStatus) {
 
-        cardService.withdrawMoney(card, new BigDecimal(operation.getAmountOfMoney()));
+        if (!card.hasEnoughMoney(operation.getAmountOfMoney())) {
+
+            bindingResult.addError(new ObjectError("card", "На карте недостаточно средств"));
+
+        }
+
+
+        if (bindingResult.hasErrors()) {
+
+            return "withdrawPage";
+
+        }
+
+        cardService.withdrawMoney(card, operation.getAmountOfMoney());
         operationService.saveOperation(operation.setOperationType(OperationType.WITHDRAWAL)
                 .setFromCard(card.getCardNumber())
                 .setDateAndTime(LocalDateTime.now())
@@ -99,10 +101,9 @@ public class CardController {
 
         sessionStatus.setComplete();
 
-        model.addAttribute("message", "Заберите деньги");
+        model.addAttribute("message", "Заберите наличные");
 
         System.out.println("С карты " + card.getCardNumber() + " снято " + operation.getAmountOfMoney());
-
         return "successfulActionPage";
 
     }
@@ -115,15 +116,19 @@ public class CardController {
 
     }
 
-    @Transactional
     @PutMapping("/{cardLastNumbers}/deposit")
     public String addMoney(@ModelAttribute("card") Card card,
-                           @ModelAttribute("operation") Operation operation,
+                           @ModelAttribute("operation") @Valid Operation operation,
+                           BindingResult bindingResult,
                            @PathVariable("cardLastNumbers") String cardLastNumbers,
                            SessionStatus sessionStatus,
                            Model model) {
 
-        cardService.putMoneyIntoAccount(card, new BigDecimal(operation.getAmountOfMoney()));
+        if (bindingResult.hasErrors()) {
+            return "depositPage";
+        }
+
+        cardService.putMoneyIntoAccount(card, operation.getAmountOfMoney());
         operationService.saveOperation(operation.setOperationType(OperationType.DEPOSIT)
                 .setToCard(card.getCardNumber())
                 .setDateAndTime(LocalDateTime.now())
@@ -134,7 +139,6 @@ public class CardController {
         model.addAttribute("message", "Баланс карты пополнен");
 
         System.out.println("На карту " + card.getCardNumber() + " положено " + operation.getAmountOfMoney());
-
         return "successfulActionPage";
 
     }
@@ -147,16 +151,36 @@ public class CardController {
 
     }
 
-    @Transactional
     @PutMapping("/{cardLastNumbers}/transfer")
     public String transferMoney(@ModelAttribute("card") Card cardFrom,
-                                @ModelAttribute("operation") Operation operation,
+                                @ModelAttribute("operation") @Valid Operation operation,
+                                BindingResult bindingResult,
                                 @PathVariable("cardLastNumbers") String cardLastNumbers,
                                 SessionStatus sessionStatus,
                                 Model model) {
 
+        if (!cardService.cardExists(operation.getToCard())) {
+
+            bindingResult.addError(new ObjectError("operation", "Такой карты не существует"));
+
+        }
+
+        if (cardFrom.getCardNumber().equals(operation.getToCard())) {
+
+            bindingResult.addError(new ObjectError("operation", "С этой карты производится операция, введите пожалуйста номер другой карты"));
+
+        }
+
+        if (bindingResult.hasErrors()) {
+
+            return "transferPage";
+
+
+        }
+
+
         Card cardTo = cardService.findByCardNumber(operation.getToCard());
-        cardService.transferMoney(cardFrom, cardTo, new BigDecimal(operation.getAmountOfMoney()));
+        cardService.transferMoney(cardFrom, cardTo, operation.getAmountOfMoney());
 
         operationService.saveOperation(operation
                 .setOperationType(OperationType.TRANSFER)
@@ -174,11 +198,8 @@ public class CardController {
                 .setCard(cardTo));
 
         sessionStatus.setComplete();
-
-        model.addAttribute("message", "Перевод выполнен");
-
+        model.addAttribute("message", "Перевод успешно произведен");
         System.out.println("ПЕРЕВОД СРЕДСТВ - " + operation.getAmountOfMoney() + " С КАРТЫ: " + cardFrom.getCardNumber() + " НА КАРТУ " + cardTo.getCardNumber());
-
         return "successfulActionPage";
 
     }
@@ -190,22 +211,33 @@ public class CardController {
 
     }
 
-    @Transactional
     @PutMapping("/{cardLastNumbers}/pin")
-    public String changePin(@ModelAttribute("card") Card cardWithNewPin,
-                            @PathVariable("cardLastNumbers") String cardLastNumbers,
+    public String changePin(@PathVariable("cardLastNumbers") String cardLastNumbers,
+                            @ModelAttribute("card") Card cardWithNewPin,
+                            BindingResult bindingResult,
                             SessionStatus sessionStatus,
                             Model model) {
 
-        cardService.updateCard(cardWithNewPin.setPin(new BCryptPasswordEncoder(12).encode(cardWithNewPin.getPin())));
-        sessionStatus.setComplete();
+        if (!cardWithNewPin.getPin().matches("\\d{4}")) {
 
+            bindingResult.addError(new ObjectError("card", "Пин-код должен состоять из 4 цифр"));
+
+        }
+
+        if (bindingResult.hasErrors()) {
+
+            bindingResult.getAllErrors().stream().forEach(x -> System.out.println("ERROR - " + x.getObjectName() + " " + x.getDefaultMessage()));
+            return "changePinPage";
+
+        }
+
+        cardService.updateOrSaveCard(cardWithNewPin.setPin(new BCryptPasswordEncoder(12).encode(cardWithNewPin.getPin())));
+        sessionStatus.setComplete();
         operationService.saveOperation(new Operation().setOperationType(OperationType.PIN_CHANGE)
                 .setDateAndTime(LocalDateTime.now())
                 .setCard(cardWithNewPin));
 
         model.addAttribute("message", "Пин-код изменен");
-
         System.out.println("Пин-код карты " + cardWithNewPin.getCardNumber() + " изменен на " + cardWithNewPin.getPin());
 
         return "successfulActionPage";
@@ -215,7 +247,13 @@ public class CardController {
     @GetMapping("/{cardLastNumbers}/history")
     public String operationHistory(@ModelAttribute(name = "card") Card card, Model model) {
 
-        System.out.println(card.getOperations());
+        List<Operation> history = card.getOperations().stream().sorted((o1, o2) -> {
+            if (o1.getDateAndTime().isBefore(o2.getDateAndTime())) return 1;
+            else if (o1.getDateAndTime().isAfter(o2.getDateAndTime())) return -1;
+            else return 0;
+        }).limit(10).collect(Collectors.toList());
+
+        model.addAttribute("history", history);
 
         return "historyPage";
 

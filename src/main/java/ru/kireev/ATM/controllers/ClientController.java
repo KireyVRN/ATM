@@ -4,18 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import ru.kireev.ATM.entities.Card;
 import ru.kireev.ATM.entities.Client;
 import ru.kireev.ATM.services.CardService;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalTime;
 
+
 @Controller
 @RequiredArgsConstructor
-@SessionAttributes(value = "client")
-//@SessionAttributes(value = {"client", "card"})
+@SessionAttributes(value = {"client", "card"})
 public class ClientController {
 
     private final CardService cardService;
@@ -23,21 +25,23 @@ public class ClientController {
     @GetMapping("/client")
     public String clientMenu(Principal principal, Model model) {
 
-        Card card = cardService.findByCardNumber(Integer.parseInt(principal.getName()));
+        Card card = cardService.findByCardNumber(principal.getName());
         System.out.println("Карта авторизации " + card);
 
         Client client = card.getClient();
         System.out.println("Клиент " + client);
 
         model.addAttribute("client", client).addAttribute("helloMessage", helloMessage(client));
-        return "clientMainPage";
+        return "clientPage";
 
     }
 
     @GetMapping("/totalBalance")
-    public String allMoney(Model model) {
+    public String totalBalance(@ModelAttribute("client") Client client, Model model) {
 
-        model.addAttribute("totalBalance", "rgtthts");
+        BigDecimal totalBalance = client.getCards().stream().map(card -> card.getBalance()).reduce((balance1, balance2) -> balance1.add(balance2)).get();
+
+        model.addAttribute("totalBalance", totalBalance);
         return "totalBalancePage";
 
     }

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet" href="/static/atmWithCard.css">
 </head>
 <body>
-<div>
+<div class="screen">
     <form th:method="POST" action="/login" th:object="${user}">
         <input type="text" id="username" name="username" placeholder="Введите номер карты"/>
         <input type="password" id="password" name="password" placeholder="Введите пин-код"/>

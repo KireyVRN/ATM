@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Deposit</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet" href="/static/atmWithCard.css">
 </head>
 <body>
-<div>
+<div class="screen">
     <p>Положите деньги в купюроприемник</p>
 
     <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}" th:object="${operation}">
         <label for="amountOfMoney"> Сумма </label>
-        <input th:type="text" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+        <input th:type="number" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+        <div class="error" th:if="${#fields.hasErrors('amountOfMoney')}" th:errors="*{amountOfMoney}">Error</div>
         <br/>
 
         <button type="submit">Положить</button>

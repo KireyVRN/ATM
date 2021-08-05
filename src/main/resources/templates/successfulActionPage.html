@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Success</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet"
+          th:href="@{(${message}=='Заберите наличные')?'/static/atmWithCash.css':'/static/atmWithCard.css'}">
 </head>
 <body>
-<div>
+<div class="screen">
     <p th:text="${message}">Message</p>
 
-    <!--    <form th:method="GET" th:action="@{'/client/'}">-->
-    <!--        <input type="submit" value="OK"/>-->
-    <!--    </form>-->
     <form th:method="GET" th:action="@{(${currentCard}?'/logoutSuccess':'/client/')}">
-        <input type="submit" value="OK"/>
+        <input type="submit" value="Продолжить"/>
     </form>
 
     <form th:action="@{'/logout'}" th:method="POST">

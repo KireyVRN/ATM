@@ -1,18 +1,19 @@
 package ru.kireev.ATM.entities;
 
+import javax.validation.constraints.*;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.IndexColumn;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Entity
-@Data()
+@Data
 @Table(name = "clients")
 @EqualsAndHashCode(exclude = "cards")
 @Accessors(chain = true)
@@ -23,9 +24,11 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+   // @NotBlank
     @Column(name = "name")
     private String name;
 
+   // @NotBlank
     @Column(name = "surname")
     private String surname;
 

@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.*;
 
+
 @Entity
 @Data
 @Table(name = "cards")
@@ -22,7 +23,7 @@ public class Card {
     private long id;
 
     @Column(name = "card_number")
-    private int cardNumber;
+    private String cardNumber;
 
     @Column(name = "pin")
     private String pin;
@@ -40,7 +41,7 @@ public class Card {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    @OneToMany(mappedBy = "card", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "card", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Operation> operations;
 
     public Card addOperation(Operation operation) {
@@ -56,6 +57,12 @@ public class Card {
     public String getLastNumbers() {
 
         return String.format("*%s", String.valueOf(cardNumber).substring(5));
+
+    }
+
+    public boolean hasEnoughMoney(BigDecimal amountOfMoney) {
+
+        return amountOfMoney.compareTo(balance) < 1;
 
     }
 

@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Pin</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet" href="/static/atmWithCard.css">
 </head>
 <body>
 <div>
+
     <p th:text="'PIN ' + ${card.pin}"> PIN </p>
 
     <br/>
@@ -15,6 +16,10 @@
 
         <label for="pin"> New PIN </label>
         <input th:type="number" th:field="*{pin}" id="pin"/>
+        <div class="error" th:if="${#fields.hasErrors('pin')}" th:errors="*{pin}">Error</div>
+        <div class="error" th:if="${#fields.hasErrors('global')}">
+            <p th:each="err : ${#fields.errors('global')}" th:text="${err}"/>
+        </div>
 
         <br/>
         <button type="submit">Изменить</button>

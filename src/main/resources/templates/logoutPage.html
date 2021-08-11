@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Logout</title>
-    <link rel="stylesheet" href="/static/atmWithCard.css">
+    <link rel="stylesheet" href="/static/styles/atmWithCard.css">
 </head>
 <body>
 <div class="screen">
-    <p>Спасибо что пользуетесь услугами нашего банка, не забудьте забрать карту!</p>
-    <form th:method="GET" th:action="@{'/'}">
-        <input type="submit" value="ОК"/>
-    </form>
+
+    <p class="message">Спасибо, что пользуетесь услугами нашего банка, не забудьте забрать карту!</p>
+
+    <div align="center">
+        <form th:method="GET" th:action="@{'/'}">
+            <button class="button" type="submit">OK</button>
+        </form>
+    </div>
+
 </div>
 </body>
 </html>

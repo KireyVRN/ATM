@@ -47,7 +47,6 @@ public class Card {
     public Card addOperation(Operation operation) {
 
         if (operations == null) operations = new ArrayList<>();
-
         this.operations.add(operation);
         operation.setCard(this);
         return this;

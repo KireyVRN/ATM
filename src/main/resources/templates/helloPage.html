@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>HelloPage</title>
-    <link rel="stylesheet" href="/static/atm.css">
+    <link rel="stylesheet" href="/static/styles/atm.css">
 </head>
 <body>
 <div class="screen">
-    <p>Пожалуйста вставьте карту</p>
-    <a th:href="@{'/login'}">OK</a>
+
+    <p class="message">Пожалуйста вставьте карту</p>
+
+    <div align="center">
+        <form th:action="@{'/login'}" th:method="GET">
+            <button class="button" type="submit">OK</button>
+        </form>
+    </div>
+
 </div>
 </body>
 </html>

@@ -1,0 +1,184 @@
+body {
+    background-image: url(../../static/images/atmWithCard.png);
+    background-color: rgb(34, 177, 76);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+
+/* ATM Screen */
+.screen {
+    background-color: rgb(225, 255, 255);
+    overflow: auto;
+    color: rgb(0, 84, 0);
+    margin-left: 7%;
+    margin-top: 7%;
+    border: 3px solid black;
+    padding-top: 1%;
+    padding-top: 1%;
+    padding-top: 1%;
+    padding-top: 1%;
+    position: fixed;
+    width: 59%;
+    height: 78%;
+}
+
+
+/* Buttons */
+.button {
+    padding: 5px 5px;
+    border-radius: 12px;
+    border: 2px solid rgb(255, 201, 14);
+    transition-duration: 0.5s;
+    text-align: center;
+    font-size: 25px;
+    font-family: Verdana;
+    width: 200px;
+    height: 80px;
+    color: white;
+    background-color: #4CAF50; /* Green */
+}
+.button:hover {
+    background-color: rgb(255, 201, 14);
+    border: 2px solid #4CAF50;
+    color: black;
+    font-family: Verdana;
+    font-size: 25px;
+}
+
+
+/* Card menu button */
+.card-menu-button {
+    padding: 5px 5px;
+    border-radius: 12px;
+    border: 2px solid rgb(255, 201, 14);
+    transition-duration: 0.5s;
+    text-align: center;
+    font-size: 25px;
+    font-family: Verdana;
+    width: 100%;
+    height: 150px;
+    color: white;
+    background-color: #4CAF50; /* Green */
+}
+.card-menu-button:hover {
+    background-color: rgb(255, 201, 14);
+    border: 2px solid #4CAF50;
+    color: black;
+    font-family: Verdana;
+    font-size: 25px;
+}
+
+
+/* Bottom buttons */
+.bottom-buttons {
+    width:100%;
+    bottom: 0;
+    position: absolute;
+}
+
+
+/* Card Menu */
+.card-menu {
+    width: 100%;
+    align: center;
+}
+.card-menu td{
+    text-align: center;
+}
+
+
+/* Card Information */
+.card-information {
+    color: rgb(0, 84, 0);
+    font-family: Verdana;
+    text-align: left;
+    margin-left: 20px;
+    font-size: 35px;
+}
+.card-menu td{
+    text-align: center;
+}
+
+
+/* Client Menu */
+.client-menu {
+    overflow-y:auto;
+    height:65%;
+}
+
+/* Usual text */
+.text {
+    font-family: Verdana;
+    font-size: 30px;
+    text-align: center;
+    overflow: hidden;
+}
+
+
+/* Information message */
+.message {
+    font-family: Verdana;
+    font-size: 300%;
+    text-align: center;
+    padding: 10%;
+    text-align: center;
+}
+
+
+/* Form */
+.form {
+    text-align: center;
+    margin:7%;
+    font-family: Verdana;
+    color: rgb(0, 84, 0);
+    font-size: 40px;
+    overflow: hidden;
+}
+.form input{
+    border-color: rgb(0, 80, 0);
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-right: 15%;
+    margin-left: 15%;
+    color: rgb(0, 80, 0);
+    font-size: 80%;
+    font-family: Verdana;
+    background-color: rgb(225, 255, 255);
+}
+
+
+/* Date and time */
+.date-and-time {
+    font-family: verdana;
+    float: right;
+    font-size: 20px;
+    padding-right: 10px;
+}
+
+
+/*Errors*/
+.error {
+    padding-top: 20px;
+    color: rgb(255, 127, 39);
+    font-size: 30px;
+}
+
+/* History of operations */
+.history {
+    font-family: Verdana;
+    font-size: 30px;
+    color: rgb(63, 72, 204);
+    text-align: left;
+    overflow: hidden;
+    padding-left: 40px;
+}
+
+/* Header */
+.header {
+    font-family: Verdana;
+    text-align: center;
+    overflow: hidden;
+    font-size:40px;
+    padding-top: 40px;
+}

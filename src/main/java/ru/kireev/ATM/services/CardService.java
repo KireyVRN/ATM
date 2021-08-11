@@ -42,10 +42,6 @@ public class CardService implements UserDetailsService {
         Card from = cardRepository.getById(cardFrom.getId());
         Card to = cardRepository.getById(cardTo.getId());
 
-        if ((from.getBalance().compareTo(amountOfMoney) < 0)) {
-            throw new RuntimeException("Недостаточно средств на карте");
-        }
-
         cardRepository.saveAndFlush(from.setBalance(cardFrom.getBalance().subtract(amountOfMoney)));
         cardRepository.saveAndFlush(to.setBalance(cardTo.getBalance().add(amountOfMoney)));
 

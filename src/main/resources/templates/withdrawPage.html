@@ -2,33 +2,51 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>WithdrawPage</title>
-    <link rel="stylesheet" href="/static/atmWithCard.css">
+    <title>Withdraw</title>
+    <link rel="stylesheet" href="/static/styles/atmWithCard.css">
+    <script src="/static/scripts/currentDateAndTime.js">timeScript</script>
 </head>
 <body>
 <div class="screen">
 
-    <p>Введите сумму</p>
+    <div class="date-and-time" id="timeAndDate">Date And Time</div>
 
-    <form th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}" th:object="${operation}">
+    <p class="text" style="font-size:40px; padding-top: 40px">Укажите сумму</p>
 
-        <label for="amountOfMoney"> Сумма </label>
-        <input th:type="number" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+    <form class="form" th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}" th:object="${operation}">
+
+        <table align="center">
+            <td>
+                <label for="amountOfMoney"> Сумма </label>
+            </td>
+            <td>
+                <input th:type="number" step="0.01" th:field="*{amountOfMoney}" id="amountOfMoney"/>
+            </td>
+        </table>
+
+        <br/>
+
         <div class="error" th:if="${#fields.hasErrors('amountOfMoney')}" th:errors="*{amountOfMoney}">Error</div>
         <div class="error" th:if="${#fields.hasErrors('global')}">
             <p th:each="err : ${#fields.errors('global')}" th:text="${err}"/>
         </div>
-        <button type="submit">Снять</button>
+
+        <button class="button" type="submit">Снять</button>
 
     </form>
 
-    <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
-        <button type="submit">Назад</button>
-    </form>
-
-    <form th:action="@{'/logout'}" th:method="POST">
-        <button type="submit">Завершить обслуживание</button>
-    </form>
+    <table class="bottom-buttons" cellspacing="10">
+        <td align="left">
+            <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
+                <button class="button" type="submit">Назад</button>
+            </form>
+        </td>
+        <td align="right">
+            <form th:action="@{'/logout'}" th:method="POST">
+                <button class="button" type="submit">Завершить обслуживание</button>
+            </form>
+        </td>
+    </table>
 
 </div>
 </body>

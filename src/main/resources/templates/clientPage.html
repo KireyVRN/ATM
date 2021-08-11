@@ -2,33 +2,50 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Personal Page</title>
-    <link rel="stylesheet" href="/static/atmWithCard.css">
+    <title>Client Menu</title>
+    <link rel="stylesheet" href="/static/styles/atmWithCard.css">
+    <script src="/static/scripts/currentDateAndTime.js">timeScript</script>
 </head>
 <body>
 <div class="screen">
 
-    <p th:text="${helloMessage}">Hello message</p>
-    <table th:object="${client}">
-        <tr th:each="card : ${client.cards}">
-            <td th:text="'Карта '+${card.getLastNumbers()}">CardLastNumbers</td>
-            <td th:text="'Баланс '+${card.balance}">Balance</td>
-            <td>
-                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
-                    <input type="submit" value="Подробнее"/>
-                </form>
-                <!--            <a th:href="@{'/client/'+${client.id}+'/card'+${card.id}}">Information</a>-->
-            </td>
-        </tr>
+    <div class="date-and-time" id="timeAndDate">Date And Time</div>
+
+    <p class="header" style="color:rgb(255, 127, 39)" th:text="${helloMessage}">Hello Message</p>
+
+    <div class="client-menu">
+        <table th:object="${client}" cellspacing="20" width="100%">
+            <tr th:each="card : ${client.cards}">
+                <td align="center">
+                    <div>
+                        <img src="../static/images/card.png" alt="cardPic"/>
+                    </div>
+                </td>
+                <td align="center">
+                    <p class="text" th:text="'Карта '+${card.getLastNumbers()}">Card Number</p>
+                    <p class="text" th:text="'Баланс '+${card.balance}">Balance</p>
+                </td>
+                <td align="center">
+                    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
+                        <button class="button" type="submit">Меню карты</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="bottom-buttons" cellspacing="10">
+        <td align="left">
+            <form th:action="@{'/totalBalance'}" th:method="GET">
+                <button class="button" type="submit">Всего средств</button>
+            </form>
+        </td>
+        <td align="right">
+            <form th:action="@{'/logout'}" th:method="POST">
+                <button class="button" type="submit">Завершить обслуживание</button>
+            </form>
+        </td>
     </table>
-
-    <form th:action="@{'/totalBalance'}" th:method="GET">
-        <button type="submit">Всего средств</button>
-    </form>
-
-    <form th:action="@{'/logout'}" th:method="POST">
-        <button type="submit">Завершить обслуживание</button>
-    </form>
 
 </div>
 </body>

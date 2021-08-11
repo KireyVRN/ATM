@@ -2,49 +2,68 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Card</title>
-    <link rel="stylesheet" href="/static/atmWithCard.css">
+    <title>Card Menu</title>
+    <link rel="stylesheet" href="/static/styles/atmWithCard.css">
+    <script src="/static/scripts/currentDateAndTime.js">timeScript</script>
 </head>
 <body>
 <div class="screen">
-    <p th:text="'Номер карты ' + ${card.cardNumber}">CardNumber</p>
-    <p th:text="'Баланс ' + ${card.balance}">CardNumber</p>
-    <p>Expire Date</p>
 
-    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}">
-        <input type="submit" value="Перевод"/>
-    </form>
+    <div class="date-and-time" id="timeAndDate">Date And Time</div>
 
-    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}">
-        <input type="submit" value="Пополнить счет"/>
-    </form>
+    <p class="card-information">Номер: <span style="color:rgb(255, 127, 39)" th:text="${card.cardNumber}">Card Number</span></p>
+    <p class="card-information">Баланс: <span style="color:rgb(255, 127, 39)" th:text="${card.balance}">Balance</span></p>
 
-    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}">
-        <input type="submit" value="Снять наличные"/>
-    </form>
+    <table class="card-menu" cellspacing="15">
+        <tr>
+            <td>
+                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}">
+                    <input class="card-menu-button" type="submit" value="Снять"/>
+                </form>
+            </td>
+            <td>
+                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}">
+                    <input class="card-menu-button" type="submit" value="Пополнить"/>
+                </form>
+            </td>
+            <td>
+                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}">
+                    <input class="card-menu-button" type="submit" value="Перевод"/>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/pin'}">
+                    <input class="card-menu-button" type="submit" value="Изменить PIN"/>
+                </form>
+            </td>
+            <td>
+                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/history'}">
+                    <input class="card-menu-button" type="submit" value="История операций"/>
+                </form>
+            </td>
+            <td>
+                <form th:method="DELETE" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
+                    <input class="card-menu-button" type="submit" value="Заблокировать"/>
+                </form>
+            </td>
+        </tr>
+    </table>
 
-    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/pin'}">
-        <input type="submit" value="Изменить PIN"/>
-    </form>
+    <table class="bottom-buttons" cellspacing="10">
+        <td align="left">
+            <form th:action="@{'/client'}" th:method="GET">
+                <button class="button" type="submit">Назад</button>
+            </form>
+        </td>
 
-    <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/history'}">
-        <input type="submit" value="История операций"/>
-    </form>
-
-
-    <form th:method="DELETE" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
-        <input type="submit" value="Заблокировать карту"/>
-    </form>
-
-
-    <form th:action="@{'/client'}" th:method="GET">
-        <button type="submit">Назад</button>
-    </form>
-
-    <form th:action="@{'/logout'}" th:method="POST">
-        <button type="submit">Завершить обслуживание</button>
-    </form>
-
+        <td align="right">
+            <form th:action="@{'/logout'}" th:method="POST">
+                <button class="button" type="submit">Завершить обслуживание</button>
+            </form>
+        </td>
+    </table>
 
 </div>
 </body>

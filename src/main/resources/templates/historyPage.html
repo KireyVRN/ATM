@@ -3,25 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>History</title>
-    <link rel="stylesheet" href="/static/atmWithCard.css">
+    <link rel="stylesheet" href="/static/styles/atmWithCard.css">
+    <script src="/static/scripts/currentDateAndTime.js">timeScript</script>
 </head>
 <body>
 <div class="screen">
-    <p>История операций</p>
 
-        <table>
+    <div class="date-and-time" id="timeAndDate">Date And Time</div>
+
+    <p class="header">История операций по карте</p>
+
+        <table class="history">
             <tr th:each="operation : ${history}">
-                <td th:text="${operation.getInformationForHistory()}">DateAndTime</td>
+                <td th:text="${operation.getInformationForHistory()}">Operation Message</td>
             </tr>
         </table>
 
-    <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
-        <button type="submit">Назад</button>
-    </form>
-
-    <form th:action="@{'/logout'}" th:method="POST">
-        <button type="submit">Завершить обслуживание</button>
-    </form>
+    <table class="bottom-buttons" cellspacing="10">
+        <td align="left">
+            <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
+                <button class="button" type="submit">Назад</button>
+            </form>
+        </td>
+        <td align="right">
+            <form th:action="@{'/logout'}" th:method="POST">
+                <button class="button" type="submit">Завершить обслуживание</button>
+            </form>
+        </td>
+    </table>
 
 </div>
 </body>

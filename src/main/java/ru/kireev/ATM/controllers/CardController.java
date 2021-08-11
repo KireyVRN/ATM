@@ -45,7 +45,6 @@ public class CardController {
                 .orElseThrow(() -> new NoSuchElementException("Такой карты не существует!"));
 
         model.addAttribute("card", card);
-
         System.out.println("Меню карты " + card.getCardNumber());
         return "cardPage";
 
@@ -55,10 +54,8 @@ public class CardController {
     public String blockCard(@ModelAttribute("card") Card card, @PathVariable("cardLastNumbers") String cardLastNumbers, Model model, Principal principal) {
 
         cardService.blockCard(card);
-
         boolean currentCard = String.valueOf(card.getCardNumber()).equals(principal.getName());
         model.addAttribute("message", "Карта заблокирована").addAttribute("currentCard", currentCard);
-
         System.out.println("КАРТА " + card.getCardNumber() + " ЗАБЛОКИРОВАНА");
         return "successfulActionPage";
 
@@ -100,9 +97,7 @@ public class CardController {
                 .setCard(card));
 
         sessionStatus.setComplete();
-
         model.addAttribute("message", "Заберите наличные");
-
         System.out.println("С карты " + card.getCardNumber() + " снято " + operation.getAmountOfMoney());
         return "successfulActionPage";
 
@@ -135,9 +130,7 @@ public class CardController {
                 .setCard(card));
 
         sessionStatus.setComplete();
-
-        model.addAttribute("message", "Баланс карты пополнен");
-
+        model.addAttribute("message", String.format("Баланс карты успешно пополнен на %s", operation.getAmountOfMoney()));
         System.out.println("На карту " + card.getCardNumber() + " положено " + operation.getAmountOfMoney());
         return "successfulActionPage";
 
@@ -159,25 +152,32 @@ public class CardController {
                                 SessionStatus sessionStatus,
                                 Model model) {
 
+        if (bindingResult.hasErrors()) {
+
+            return "transferPage";
+
+        }
+
         if (!cardService.cardExists(operation.getToCard())) {
 
             bindingResult.addError(new ObjectError("operation", "Такой карты не существует"));
+            return "transferPage";
+
+        }
+
+        if (!cardFrom.hasEnoughMoney(operation.getAmountOfMoney())) {
+
+            bindingResult.addError(new ObjectError("card", "На карте недостаточно средств"));
+            return "transferPage";
 
         }
 
         if (cardFrom.getCardNumber().equals(operation.getToCard())) {
 
             bindingResult.addError(new ObjectError("operation", "С этой карты производится операция, введите пожалуйста номер другой карты"));
-
-        }
-
-        if (bindingResult.hasErrors()) {
-
             return "transferPage";
 
-
         }
-
 
         Card cardTo = cardService.findByCardNumber(operation.getToCard());
         cardService.transferMoney(cardFrom, cardTo, operation.getAmountOfMoney());
@@ -218,15 +218,16 @@ public class CardController {
                             SessionStatus sessionStatus,
                             Model model) {
 
-        if (!cardWithNewPin.getPin().matches("\\d{4}")) {
-
-            bindingResult.addError(new ObjectError("card", "Пин-код должен состоять из 4 цифр"));
-
-        }
 
         if (bindingResult.hasErrors()) {
 
-            bindingResult.getAllErrors().stream().forEach(x -> System.out.println("ERROR - " + x.getObjectName() + " " + x.getDefaultMessage()));
+            return "changePinPage";
+
+        }
+
+        if (!cardWithNewPin.getPin().matches("\\d{4}")) {
+
+            bindingResult.addError(new ObjectError("card", "Пин-код должен состоять из 4 цифр"));
             return "changePinPage";
 
         }
@@ -239,7 +240,6 @@ public class CardController {
 
         model.addAttribute("message", "Пин-код изменен");
         System.out.println("Пин-код карты " + cardWithNewPin.getCardNumber() + " изменен на " + cardWithNewPin.getPin());
-
         return "successfulActionPage";
 
     }
@@ -254,7 +254,6 @@ public class CardController {
         }).limit(10).collect(Collectors.toList());
 
         model.addAttribute("history", history);
-
         return "historyPage";
 
     }

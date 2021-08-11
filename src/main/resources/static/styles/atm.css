@@ -1,0 +1,54 @@
+body {
+    background-image: url(../../static/images/atm.png);
+    background-color: rgb(34, 177, 76);
+    background-size: cover;
+    background-repeat: no-repeat;
+    }
+
+
+/*ATM Screen*/
+.screen {
+    background-color: rgb(225, 255, 255);
+    color: rgb(0, 84, 0);
+    margin-left: 7%;
+    margin-top: 7%;
+    border: 3px solid black;
+    padding-top: 1%;
+    padding-top: 1%;
+    padding-top: 1%;
+    padding-top: 1%;
+    position: fixed;
+    width: 59%;
+    height: 79%;
+    }
+
+
+/*Buttons*/
+.button {
+    padding: 5px 5px;
+    border-radius: 12px;
+    border: 2px solid rgb(255, 201, 14);
+    transition-duration: 0.5s;
+    text-align: center;
+    font-size: 25px;
+    font-family: Verdana;
+    width: 200px;
+    height: 80px;
+    color: white;
+    background-color: #4CAF50; /* Green */
+}
+.button:hover {
+    background-color: rgb(255, 201, 14);
+    border: 2px solid #4CAF50;
+    color: black;
+    font-family: Verdana;
+    font-size: 25px;
+}
+
+/*Text*/
+.message {
+    font-family: Verdana;
+    font-size: 300%;
+    text-align: center;
+    padding: 10%;
+}

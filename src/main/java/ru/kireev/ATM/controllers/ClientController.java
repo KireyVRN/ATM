@@ -17,7 +17,7 @@ import java.time.LocalTime;
 
 @Controller
 @RequiredArgsConstructor
-@SessionAttributes(value = {"client", "card"})
+@SessionAttributes(value = "client")
 public class ClientController {
 
     private final CardService cardService;
@@ -26,11 +26,7 @@ public class ClientController {
     public String clientMenu(Principal principal, Model model) {
 
         Card card = cardService.findByCardNumber(principal.getName());
-        System.out.println("Карта авторизации " + card);
-
         Client client = card.getClient();
-        System.out.println("Клиент " + client);
-
         model.addAttribute("client", client).addAttribute("helloMessage", helloMessage(client));
         return "clientPage";
 

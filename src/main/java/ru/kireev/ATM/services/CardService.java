@@ -1,6 +1,8 @@
 package ru.kireev.ATM.services;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class CardService implements UserDetailsService {
 
     private final CardRepository cardRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CardService.class);
 
     public Card findByCardNumber(String cardNumber) {
 
@@ -30,9 +33,11 @@ public class CardService implements UserDetailsService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void updateOrSaveCard(Card card) {
+    public void changePin(Card card) {
 
+        String unencryptedPin = card.getPin();
         cardRepository.saveAndFlush(card.setPin(new BCryptPasswordEncoder(12).encode(card.getPin())));
+        LOGGER.info(String.format("Card %s pin was changed on %s", card.getCardNumber(), unencryptedPin));
 
     }
 
@@ -45,11 +50,15 @@ public class CardService implements UserDetailsService {
         cardRepository.saveAndFlush(from.setBalance(cardFrom.getBalance().subtract(amountOfMoney)));
         cardRepository.saveAndFlush(to.setBalance(cardTo.getBalance().add(amountOfMoney)));
 
+        LOGGER.info(String.format("Money %s was transferred from card %s to card %s", amountOfMoney, cardFrom.getCardNumber(), cardTo.getCardNumber()));
+
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void blockCard(Card card) {
 
         cardRepository.deleteById(card.getId());
+        LOGGER.info("Card " + card.getCardNumber() + " was blocked");
 
     }
 
@@ -58,6 +67,7 @@ public class CardService implements UserDetailsService {
 
         card.setBalance(cardRepository.getById(card.getId()).getBalance().add(amountOfMoney));
         cardRepository.saveAndFlush(card);
+        LOGGER.info(String.format("Money %s was put on the card %s", amountOfMoney, card.getCardNumber()));
 
     }
 
@@ -65,12 +75,8 @@ public class CardService implements UserDetailsService {
     public void withdrawMoney(Card card, BigDecimal amountOfMoney) {
 
         Card c = cardRepository.getById(card.getId());
-
-        if ((c.getBalance().compareTo(amountOfMoney) < 0)) {
-            throw new RuntimeException("Недостаточно средств на карте");
-        }
-
         cardRepository.saveAndFlush(c.setBalance(c.getBalance().subtract(amountOfMoney)));
+        LOGGER.info(String.format("Money %s was withdrawn from the card %s", amountOfMoney, card.getCardNumber()));
 
     }
 

@@ -1,7 +1,6 @@
 package ru.kireev.ATM.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,9 +11,7 @@ import ru.kireev.ATM.entities.Card;
 import ru.kireev.ATM.entities.Client;
 import ru.kireev.ATM.entities.Operation;
 import ru.kireev.ATM.entities.OperationType;
-import ru.kireev.ATM.services.BankService;
 import ru.kireev.ATM.services.CardService;
-import ru.kireev.ATM.services.ClientService;
 import ru.kireev.ATM.services.OperationService;
 
 import javax.validation.Valid;
@@ -30,9 +27,7 @@ import java.util.stream.Collectors;
 @SessionAttributes(value = {"client", "card"})
 public class CardController {
 
-    private final BankService bankService;
     private final CardService cardService;
-    private final ClientService clientService;
     private final OperationService operationService;
 
     @GetMapping("/{cardLastNumbers}")
@@ -45,7 +40,6 @@ public class CardController {
                 .orElseThrow(() -> new NoSuchElementException("Такой карты не существует!"));
 
         model.addAttribute("card", card);
-        System.out.println("Меню карты " + card.getCardNumber());
         return "cardPage";
 
     }
@@ -55,8 +49,7 @@ public class CardController {
 
         cardService.blockCard(card);
         boolean currentCard = String.valueOf(card.getCardNumber()).equals(principal.getName());
-        model.addAttribute("message", "Карта заблокирована").addAttribute("currentCard", currentCard);
-        System.out.println("КАРТА " + card.getCardNumber() + " ЗАБЛОКИРОВАНА");
+        model.addAttribute("currentCard", currentCard).addAttribute("message", "Карта заблокирована");
         return "successfulActionPage";
 
     }
@@ -98,7 +91,6 @@ public class CardController {
 
         sessionStatus.setComplete();
         model.addAttribute("message", "Заберите наличные");
-        System.out.println("С карты " + card.getCardNumber() + " снято " + operation.getAmountOfMoney());
         return "successfulActionPage";
 
     }
@@ -131,7 +123,6 @@ public class CardController {
 
         sessionStatus.setComplete();
         model.addAttribute("message", String.format("Баланс карты успешно пополнен на %s", operation.getAmountOfMoney()));
-        System.out.println("На карту " + card.getCardNumber() + " положено " + operation.getAmountOfMoney());
         return "successfulActionPage";
 
     }
@@ -174,7 +165,7 @@ public class CardController {
 
         if (cardFrom.getCardNumber().equals(operation.getToCard())) {
 
-            bindingResult.addError(new ObjectError("operation", "С этой карты производится операция, введите пожалуйста номер другой карты"));
+            bindingResult.addError(new ObjectError("operation", "С этой карты производится текущая операция, введите номер другой карты"));
             return "transferPage";
 
         }
@@ -198,8 +189,7 @@ public class CardController {
                 .setCard(cardTo));
 
         sessionStatus.setComplete();
-        model.addAttribute("message", "Перевод успешно произведен");
-        System.out.println("ПЕРЕВОД СРЕДСТВ - " + operation.getAmountOfMoney() + " С КАРТЫ: " + cardFrom.getCardNumber() + " НА КАРТУ " + cardTo.getCardNumber());
+        model.addAttribute("message", String.format("Перевод на имя \"%s %s\" успешно выполнен", cardTo.getClient().getName(), cardTo.getClient().getSurname()));
         return "successfulActionPage";
 
     }
@@ -232,14 +222,13 @@ public class CardController {
 
         }
 
-        cardService.updateOrSaveCard(cardWithNewPin.setPin(new BCryptPasswordEncoder(12).encode(cardWithNewPin.getPin())));
+        cardService.changePin(cardWithNewPin);
         sessionStatus.setComplete();
         operationService.saveOperation(new Operation().setOperationType(OperationType.PIN_CHANGE)
                 .setDateAndTime(LocalDateTime.now())
                 .setCard(cardWithNewPin));
 
         model.addAttribute("message", "Пин-код изменен");
-        System.out.println("Пин-код карты " + cardWithNewPin.getCardNumber() + " изменен на " + cardWithNewPin.getPin());
         return "successfulActionPage";
 
     }

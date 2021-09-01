@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Table(name = "roles")
 @Accessors(chain = true)
 @EqualsAndHashCode
-//@ToString()
+@ToString()
 public class Role {
 
     @Id

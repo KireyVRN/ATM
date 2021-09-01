@@ -1,7 +1,5 @@
 package ru.kireev.ATM.entities;
 
-import javax.validation.constraints.*;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -24,15 +22,13 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-   // @NotBlank
     @Column(name = "name")
     private String name;
 
-   // @NotBlank
     @Column(name = "surname")
     private String surname;
 
-    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
     private Set<Card> cards;
 
     public Client addCard(Card card) {

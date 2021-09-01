@@ -164,6 +164,7 @@ body {
     font-size: 30px;
 }
 
+
 /* History of operations */
 .history {
     font-family: Verdana;
@@ -173,6 +174,7 @@ body {
     overflow: hidden;
     padding-left: 40px;
 }
+
 
 /* Header */
 .header {

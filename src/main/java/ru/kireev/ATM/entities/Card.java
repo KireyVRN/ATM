@@ -31,7 +31,7 @@ public class Card {
     @Column(name = "balance")
     private BigDecimal balance;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
 

@@ -30,7 +30,7 @@ public class Operation {
 
     @Column(name = "amount_of_money")
     @Digits(integer = 50, fraction = 2, message = "Некорректная сумма")
-    @DecimalMin(value = "0.01", message = "Сумма должна быть не менее 0.01 руб")
+    @DecimalMin(value = "0.01", message = "Сумма должна быть не менее 0.01")
     private BigDecimal amountOfMoney;
 
     @Column(name = "from_card")

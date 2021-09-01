@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="stylesheet" href="/static/styles/atmWithCard.css">
+</head>
+<body>
+<div class="screen">
+
+    <div align="center" style="font-size: 40px; color:red; margin:10%; font-family: verdana">
+        <p>Что-то пошло не так!</p>
+        <p th:text="${error}">Error</p>
+    </div>
+
+    <div align="center">
+        <form th:action="@{'/logout'}" th:method="POST">
+            <button class="button" type="submit">OK</button>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

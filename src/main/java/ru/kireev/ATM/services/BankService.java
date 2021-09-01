@@ -12,7 +12,6 @@ import ru.kireev.ATM.repositories.RoleRepository;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -25,8 +24,6 @@ public class BankService {
     private final ClientRepository clientRepository;
     private final OperationRepository operationRepository;
     private final RoleRepository roleRepository;
-
-    private final CardService cardService;
 
 
     @PostConstruct

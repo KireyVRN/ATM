@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Block Card Confirmation</title>
+    <link rel="stylesheet" href="/static/styles/atmWithCard.css">
+    <script src="/static/scripts/currentDateAndTime.js">timeScript</script>
+</head>
+<body>
+<div class="screen">
+
+    <div class="date-and-time" id="timeAndDate">Date And Time</div>
+
+    <p class="message">Вы уверены, что хотите заблокировать карту?</p>
+
+    <table align="center" cellspacing="10">
+        <td align="left">
+            <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="DELETE">
+                <button class="button" type="submit">Да</button>
+            </form>
+        </td>
+        <td align="right">
+            <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
+                <button class="button" type="submit">Отмена</button>
+            </form>
+        </td>
+    </table>
+
+</div>
+</body>
+</html>

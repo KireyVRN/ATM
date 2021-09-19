@@ -44,7 +44,7 @@
                 </form>
             </td>
             <td>
-                <form th:method="DELETE" th:action="@{'/client/card/'+${card.getLastNumbers()}}">
+                <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/blockConfirmation'}">
                     <input class="card-menu-button" type="submit" value="Заблокировать"/>
                 </form>
             </td>

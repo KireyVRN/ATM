@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Unsuccessful Login</title>
+    <link rel="stylesheet" href="/static/styles/atm.css">
+</head>
+<body>
+<div class="screen">
+
+    <p class="message">Неверный номер карты или пин-код</p>
+
+    <div align="center">
+        <form th:action="@{'/login'}" th:method="GET">
+            <button class="button" type="submit">OK</button>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

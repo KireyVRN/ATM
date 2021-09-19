@@ -61,6 +61,7 @@ public class Card {
 
     public boolean hasEnoughMoney(BigDecimal amountOfMoney) {
 
+        if (amountOfMoney == null) amountOfMoney = new BigDecimal(0);
         return amountOfMoney.compareTo(balance) < 1;
 
     }

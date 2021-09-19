@@ -18,7 +18,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -44,11 +43,22 @@ public class CardController {
 
     }
 
+    @GetMapping("/{cardLastNumbers}/blockConfirmation")
+    public String blockCardConfirmation(@PathVariable("cardLastNumbers") String cardLastNumbers) {
+
+        return "blockCardConfirmationPage";
+
+    }
+
     @DeleteMapping("/{cardLastNumbers}")
-    public String blockCard(@ModelAttribute("card") Card card, @PathVariable("cardLastNumbers") String cardLastNumbers, Model model, Principal principal) {
+    public String blockCard(@ModelAttribute("card") Card card,
+                            @PathVariable("cardLastNumbers") String cardLastNumbers,
+                            Model model, Principal principal,
+                            SessionStatus sessionStatus) {
 
         cardService.blockCard(card);
-        boolean currentCard = String.valueOf(card.getCardNumber()).equals(principal.getName());
+        boolean currentCard = card.getCardNumber().equals(principal.getName());
+        sessionStatus.setComplete();
         model.addAttribute("currentCard", currentCard).addAttribute("message", "Карта заблокирована");
         return "successfulActionPage";
 
@@ -70,22 +80,20 @@ public class CardController {
                                 Model model,
                                 SessionStatus sessionStatus) {
 
-        if (!card.hasEnoughMoney(operation.getAmountOfMoney())) {
-
-            bindingResult.addError(new ObjectError("card", "На карте недостаточно средств"));
-
-        }
-
-
         if (bindingResult.hasErrors()) {
-
             return "withdrawPage";
-
         }
 
-        cardService.withdrawMoney(card, operation.getAmountOfMoney());
-        operationService.saveOperation(operation.setOperationType(OperationType.WITHDRAWAL)
-                .setFromCard(card.getCardNumber())
+        try {
+            cardService.withdrawMoney(card, operation.getAmountOfMoney());
+        } catch (IllegalArgumentException e) {
+            bindingResult.addError(new ObjectError("error", e.getMessage()));
+            return "withdrawPage";
+        }
+
+        operationService.saveOperation(operation
+                .setOperationType(OperationType.WITHDRAWAL)
+                .setFromCardNumber(card.getCardNumber())
                 .setDateAndTime(LocalDateTime.now())
                 .setCard(card));
 
@@ -116,13 +124,14 @@ public class CardController {
         }
 
         cardService.putMoneyIntoAccount(card, operation.getAmountOfMoney());
-        operationService.saveOperation(operation.setOperationType(OperationType.DEPOSIT)
-                .setToCard(card.getCardNumber())
+        operationService.saveOperation(operation
+                .setOperationType(OperationType.DEPOSIT)
+                .setToCardNumber(card.getCardNumber())
                 .setDateAndTime(LocalDateTime.now())
                 .setCard(card));
 
         sessionStatus.setComplete();
-        model.addAttribute("message", String.format("Баланс карты успешно пополнен на %s", operation.getAmountOfMoney()));
+        model.addAttribute("message", "Баланс карты успешно пополнен");
         return "successfulActionPage";
 
     }
@@ -144,46 +153,28 @@ public class CardController {
                                 Model model) {
 
         if (bindingResult.hasErrors()) {
-
             return "transferPage";
-
         }
 
-        if (!cardService.cardExists(operation.getToCard())) {
-
-            bindingResult.addError(new ObjectError("operation", "Такой карты не существует"));
+        try {
+            cardService.transferMoney(cardFrom, operation.getToCardNumber(), operation.getAmountOfMoney());
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            bindingResult.addError(new ObjectError("exception", e.getMessage()));
             return "transferPage";
-
         }
 
-        if (!cardFrom.hasEnoughMoney(operation.getAmountOfMoney())) {
-
-            bindingResult.addError(new ObjectError("card", "На карте недостаточно средств"));
-            return "transferPage";
-
-        }
-
-        if (cardFrom.getCardNumber().equals(operation.getToCard())) {
-
-            bindingResult.addError(new ObjectError("operation", "С этой карты производится текущая операция, введите номер другой карты"));
-            return "transferPage";
-
-        }
-
-        Card cardTo = cardService.findByCardNumber(operation.getToCard());
-        cardService.transferMoney(cardFrom, cardTo, operation.getAmountOfMoney());
+        Card cardTo = cardService.getCardByNumber(operation.getToCardNumber());
 
         operationService.saveOperation(operation
                 .setOperationType(OperationType.TRANSFER)
-                .setFromCard(cardFrom.getCardNumber())
-                .setToCard(cardTo.getCardNumber())
+                .setFromCardNumber(cardFrom.getCardNumber())
                 .setDateAndTime(LocalDateTime.now())
                 .setCard(cardFrom));
 
         operationService.saveOperation(new Operation()
                 .setOperationType(OperationType.TRANSFER)
-                .setFromCard(cardFrom.getCardNumber())
-                .setToCard(cardTo.getCardNumber())
+                .setFromCardNumber(cardFrom.getCardNumber())
+                .setToCardNumber(cardTo.getCardNumber())
                 .setAmountOfMoney(operation.getAmountOfMoney())
                 .setDateAndTime(LocalDateTime.now())
                 .setCard(cardTo));
@@ -208,25 +199,23 @@ public class CardController {
                             SessionStatus sessionStatus,
                             Model model) {
 
-
         if (bindingResult.hasErrors()) {
-
             return "changePinPage";
-
         }
 
-        if (!cardWithNewPin.getPin().matches("\\d{4}")) {
-
-            bindingResult.addError(new ObjectError("card", "Пин-код должен состоять из 4 цифр"));
+        try {
+            cardService.changePin(cardWithNewPin);
+        } catch (IllegalArgumentException e) {
+            bindingResult.addError(new ObjectError("error", e.getMessage()));
             return "changePinPage";
-
         }
 
-        cardService.changePin(cardWithNewPin);
         sessionStatus.setComplete();
-        operationService.saveOperation(new Operation().setOperationType(OperationType.PIN_CHANGE)
+        operationService.saveOperation(new Operation()
+                .setOperationType(OperationType.PIN_CHANGE)
                 .setDateAndTime(LocalDateTime.now())
-                .setCard(cardWithNewPin));
+                .setCard(cardWithNewPin)
+                .setAmountOfMoney(cardWithNewPin.getBalance()));
 
         model.addAttribute("message", "Пин-код изменен");
         return "successfulActionPage";
@@ -236,13 +225,7 @@ public class CardController {
     @GetMapping("/{cardLastNumbers}/history")
     public String operationHistory(@ModelAttribute(name = "card") Card card, Model model) {
 
-        List<Operation> history = card.getOperations().stream().sorted((o1, o2) -> {
-            if (o1.getDateAndTime().isBefore(o2.getDateAndTime())) return 1;
-            else if (o1.getDateAndTime().isAfter(o2.getDateAndTime())) return -1;
-            else return 0;
-        }).limit(10).collect(Collectors.toList());
-
-        model.addAttribute("history", history);
+        model.addAttribute("history", operationService.getLastOperationsByCard(card));
         return "historyPage";
 
     }

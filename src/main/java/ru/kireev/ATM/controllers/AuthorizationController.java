@@ -28,4 +28,11 @@ public class AuthorizationController {
 
     }
 
+    @GetMapping("/loginFailed")
+    public String loginFailed() {
+
+        return "loginFailedPage";
+
+    }
+
 }

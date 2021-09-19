@@ -25,7 +25,7 @@ public class ClientController {
     @GetMapping("/client")
     public String clientMenu(Principal principal, Model model) {
 
-        Card card = cardService.findByCardNumber(principal.getName());
+        Card card = cardService.getCardByNumber(principal.getName());
         Client client = card.getClient();
         model.addAttribute("client", client).addAttribute("helloMessage", helloMessage(client));
         return "clientPage";
@@ -35,7 +35,11 @@ public class ClientController {
     @GetMapping("/totalBalance")
     public String totalBalance(@ModelAttribute("client") Client client, Model model) {
 
-        BigDecimal totalBalance = client.getCards().stream().map(card -> card.getBalance()).reduce((balance1, balance2) -> balance1.add(balance2)).get();
+        BigDecimal totalBalance = client
+                .getCards().stream()
+                .map(card -> card.getBalance())
+                .reduce((balance1, balance2) -> balance1.add(balance2))
+                .get();
 
         model.addAttribute("totalBalance", totalBalance);
         return "totalBalancePage";

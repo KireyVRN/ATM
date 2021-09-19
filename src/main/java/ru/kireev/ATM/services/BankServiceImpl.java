@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class BankService {
+public class BankServiceImpl {
 
     private final CardRepository cardRepository;
     private final ClientRepository clientRepository;

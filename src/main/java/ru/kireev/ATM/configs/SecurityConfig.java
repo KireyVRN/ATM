@@ -35,13 +35,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/static/**", "/h2-console/**").permitAll()
+                .antMatchers("/", "/login", "/static/**", "/loginFailed", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login").permitAll()
-                //.defaultSuccessUrl("/client")
-                .successHandler(authenticationSuccessHandler()).failureHandler(authenticationFailureHandler())
-                .and().headers().frameOptions().disable()
+                .formLogin().loginPage("/login")
+                .successHandler(authenticationSuccessHandler()).defaultSuccessUrl("/client")
+                .failureHandler(authenticationFailureHandler()).failureUrl("/loginFailed")
+                .and()
+                .headers().frameOptions().disable()
                 .and()
                 .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .addLogoutHandler(logoutHandler())
@@ -54,7 +55,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     protected PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder(12);
+
     }
 
     @Bean
@@ -89,12 +92,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException {
 
                 httpServletResponse.sendRedirect(httpServletResponse.encodeURL("/login"));
-                LOGGER.info(String.format("Unsuccessful attempt to log in with next data -> card: %s, PIN: %s", httpServletRequest.getParameter("username"), httpServletRequest.getParameter("password")));
+                LOGGER.error(String.format("Unsuccessful attempt to log in with next data -> card: %s, PIN: %s", httpServletRequest.getParameter("username"), httpServletRequest.getParameter("password")));
 
             }
         };
     }
 
+    @Bean
     protected LogoutHandler logoutHandler() {
 
         return new LogoutHandler() {

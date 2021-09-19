@@ -10,7 +10,7 @@
     <appender name="AtmActions" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>src/main/resources/logs/atmActions.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss:ms} - %msg%n</Pattern>
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss:ms} %-5level - %msg%n</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>src/main/resources/logs/atm-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
@@ -46,12 +46,29 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="Errors" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>src/main/resources/logs/errors.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss:ms} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>src/main/resources/logs/errors.%d{yyyy-ww}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
     <root level="INFO">
         <appender-ref ref="ApplicationLogs"/>
         <appender-ref ref="Console"/>
+        <appender-ref ref="Errors"/>
     </root>
 
-    <logger name="ru.kireev.ATM.services.CardService" level="INFO" additivity="false">
+    <logger name="ru.kireev.ATM.services.CardServiceImpl" level="INFO" additivity="false">
         <appender-ref ref="AtmActions"/>
         <appender-ref ref="Console"/>
     </logger>
@@ -61,7 +78,7 @@
         <appender-ref ref="Console"/>
     </logger>
 
-    <logger name="org.hibernate.SQL" level="DEBUG" additivity="true">
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
         <appender-ref ref="SqlQueries"/>
     </logger>
 

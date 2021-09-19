@@ -13,7 +13,8 @@
 
     <p class="text" style="font-size:40px; padding-top: 40px">Введите данные</p>
 
-    <form class="form" th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}" th:object="${operation}">
+    <form class="form" th:method="PUT" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}"
+          th:object="${operation}">
 
         <table align="center">
             <tr>
@@ -26,16 +27,16 @@
             </tr>
             <tr>
                 <td align="left">
-                    <label for="toCard"> Получатель </label>
+                    <label for="toCardNumber"> Получатель </label>
                 </td>
                 <td>
-                    <input th:type="number" th:field="*{toCard}" id="toCard"/>
+                    <input th:type="number" th:field="*{toCardNumber}" id="toCardNumber"/>
                 </td>
             </tr>
         </table>
 
         <div class="error" th:if="${#fields.hasErrors('amountOfMoney')}" th:errors="*{amountOfMoney}">Error</div>
-        <div class="error" th:if="${#fields.hasErrors('toCard')}" th:errors="*{toCard}">Error</div>
+        <div class="error" th:if="${#fields.hasErrors('toCardNumber')}" th:errors="*{toCardNumber}">Error</div>
         <div class="error" th:if="${#fields.hasErrors('global')}">
             <p th:each="err : ${#fields.errors('global')}" th:text="${err}"/>
         </div>

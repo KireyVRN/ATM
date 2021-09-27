@@ -4,7 +4,6 @@ import javax.validation.constraints.*;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -17,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 @Data
 @Table(name = "operations")
 @Accessors(chain = true)
-@ToString
 @EqualsAndHashCode
 public class Operation {
 
@@ -25,13 +23,15 @@ public class Operation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "operation_type")
     private OperationType operationType;
 
     @NotNull(message = "Укажите сумму")
     @Column(name = "amount_of_money")
-    @Digits(integer = 50, fraction = 2, message = "Некорректная сумма")
+    @Digits(integer = 11, fraction = 2, message = "Некорректная сумма")
     @DecimalMin(value = "0.01", message = "Сумма должна быть не менее 0.01")
+    @DecimalMax(value = "1000000000", message = "Максимальная сумма операции - 1 000 000 000")
     private BigDecimal amountOfMoney;
 
     @Column(name = "from_card")
@@ -44,7 +44,7 @@ public class Operation {
     @Column(name = "date_and_time")
     private LocalDateTime dateAndTime;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "card_id", referencedColumnName = "id")
     private Card card;
 
@@ -53,16 +53,18 @@ public class Operation {
         String information = null;
 
         switch (operationType) {
+
             case DEPOSIT -> information = String.format("%s Пополнение баланса %s", dateAndTime.format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")), amountOfMoney);
             case WITHDRAWAL -> information = String.format("%s Вывод средств %s", dateAndTime.format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")), amountOfMoney);
             case TRANSFER -> {
+
                 if (card.getCardNumber().equals(fromCardNumber)) {
                     information = String.format("%s Перевод %s на %s", dateAndTime.format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")), amountOfMoney, toCardNumber);
                 } else {
                     information = String.format("%s Перевод %s от %s", dateAndTime.format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")), amountOfMoney, fromCardNumber);
                 }
+
             }
-            case PIN_CHANGE -> information = String.format("%s Изменение пин-кода", dateAndTime.format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
         }
 
         return information;

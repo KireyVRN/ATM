@@ -40,17 +40,17 @@ public class CardServiceImpl implements CardService {
 
         if (cardFrom.getCardNumber().equals(cardToNumber)) {
 
-            LOGGER.error(String.format("Attempt to transfer money to the same card %s", cardFrom.getCardNumber()));
+            LOGGER.warn(String.format("Attempt to transfer money to the same card %s", cardFrom.getCardNumber()));
             throw new IllegalArgumentException("С этой карты производится текущая операция, введите номер другой карты");
 
         } else if (cardRepository.findByCardNumber(cardToNumber).isEmpty()) {
 
-            LOGGER.error(String.format("Attempt to transfer money(%s) from card %s to not existing card %s", amountOfMoney, cardFrom.getCardNumber(), cardToNumber));
+            LOGGER.warn(String.format("Attempt to transfer money(%s) from card %s to not existing card %s", amountOfMoney, cardFrom.getCardNumber(), cardToNumber));
             throw new NoSuchElementException("Такой карты не существует");
 
         } else if (!cardFrom.hasEnoughMoney(amountOfMoney)) {
 
-            LOGGER.error(String.format("Attempt to transfer too much money(%s) from card %s", amountOfMoney, cardFrom.getCardNumber()));
+            LOGGER.warn(String.format("Attempt to transfer too much money(%s) from card %s", amountOfMoney, cardFrom.getCardNumber()));
             throw new IllegalArgumentException("На карте недостаточно средств");
 
         } else {
@@ -66,9 +66,11 @@ public class CardServiceImpl implements CardService {
 
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional
     public void blockCard(Card card) {
 
+        //удаляем ссылки у операций на карту, чтобы избежать нарушения ограничения ссылочной целостности
+        cardRepository.getById(card.getId()).getOperations().stream().forEach(operation -> operation.setCard(null));
         cardRepository.deleteById(card.getId());
         LOGGER.info("Card " + card.getCardNumber() + " was blocked");
 
@@ -92,17 +94,17 @@ public class CardServiceImpl implements CardService {
             card.setBalance(card.getBalance().subtract(amountOfMoney));
             LOGGER.info(String.format("Money %s was withdrawn from card %s", amountOfMoney, card.getCardNumber()));
         } else {
-            LOGGER.error(String.format("Attempt to withdraw too much money(%s) from card %s", amountOfMoney, card.getCardNumber()));
+            LOGGER.warn(String.format("Attempt to withdraw too much money(%s) from card %s", amountOfMoney, card.getCardNumber()));
             throw new IllegalArgumentException("На карте недостаточно средств");
         }
 
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional
     public void changePin(Card card) throws IllegalArgumentException {
 
         if (!card.getPin().matches("\\d{4}")) {
-            LOGGER.error(String.format("Attempt to change PIN to an incorrect one on card %s", card.getCardNumber()));
+            LOGGER.warn(String.format("Attempt to change PIN to an incorrect one on card %s", card.getCardNumber()));
             throw new IllegalArgumentException("Пин-код должен состоять из 4 цифр");
         } else {
             cardRepository
@@ -113,7 +115,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String cardNumber) throws UsernameNotFoundException {
 
         Card authorizationCard = cardRepository.findByCardNumber(cardNumber).orElseThrow(() -> new UsernameNotFoundException("Пользователя не существует"));

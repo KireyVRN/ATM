@@ -2,8 +2,6 @@ package ru.kireev.ATM.entities;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,15 +12,13 @@ import java.util.*;
 @Data
 @Table(name = "cards")
 @EqualsAndHashCode(exclude = {"operations", "roles"})
-@Accessors(chain = true)
-@ToString(exclude = {"operations", "roles"})
 public class Card {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "card_number")
+    @Column(name = "card_number", unique = true)
     private String cardNumber;
 
     @Column(name = "pin")
@@ -35,23 +31,14 @@ public class Card {
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "cards_roles",
             joinColumns = @JoinColumn(name = "card_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    @OneToMany(mappedBy = "card", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Operation> operations;
-
-    public Card addOperation(Operation operation) {
-
-        if (operations == null) operations = new ArrayList<>();
-        this.operations.add(operation);
-        operation.setCard(this);
-        return this;
-
-    }
+    @OneToMany(mappedBy = "card", fetch = FetchType.LAZY)
+    private Set<Operation> operations;
 
     public String getLastNumbers() {
 

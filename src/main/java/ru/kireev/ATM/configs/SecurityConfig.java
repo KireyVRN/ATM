@@ -92,7 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException {
 
                 httpServletResponse.sendRedirect(httpServletResponse.encodeURL("/login"));
-                LOGGER.warn(String.format("Unsuccessful attempt to log in with next data -> card: %s, PIN: %s", httpServletRequest.getParameter("username"), httpServletRequest.getParameter("password")));
+                LOGGER.error(String.format("Unsuccessful attempt to log in with next data -> card: %s, PIN: %s", httpServletRequest.getParameter("username"), httpServletRequest.getParameter("password")));
 
             }
         };

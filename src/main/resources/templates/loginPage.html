@@ -10,14 +10,14 @@
 
     <form class="form" th:method="POST" action="/login" th:object="${user}">
 
-        <p>Введите данные</p>
+        <p th:text="#{message.enterData}">Enter your data</p>
 
-        <input type="text" id="username" name="username" placeholder="Номер карты"/>
+        <input type="text" id="username" name="username" th:placeholder="#{text.cardNumber}"/>
         <br/>
-        <input type="password" id="password" name="password" placeholder="Пин-код"/>
+        <input type="password" id="password" name="password" th:placeholder="#{text.pin}"/>
         <br/>
 
-        <button class="button" type="submit" style="margin: 6%">Войти</button>
+        <button class="button" type="submit" style="margin: 6%" th:text="#{button.enter}">Login</button>
 
     </form>
 

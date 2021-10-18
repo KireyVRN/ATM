@@ -11,41 +11,41 @@
 
     <div class="date-and-time" id="timeAndDate">Date And Time</div>
 
-    <p class="card-information">Номер: <span style="color:rgb(255, 127, 39)" th:text="${card.cardNumber}">Card Number</span></p>
-    <p class="card-information">Баланс: <span style="color:rgb(255, 127, 39)" th:text="${card.balance}">Balance</span></p>
+    <p class="card-information"> <span th:text="#{text.number}+':'">Number:</span> <span style="color:rgb(255, 127, 39)" th:text="${card.cardNumber}">Card Number</span> </p>
+    <p class="card-information"> <span th:text="#{text.balance}+':'">Balance:</span> <span style="color:rgb(255, 127, 39)" th:text="${card.balance}">Balance</span> </p>
 
     <table class="card-menu" cellspacing="15">
         <tr>
             <td>
                 <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/withdraw'}">
-                    <input class="card-menu-button" type="submit" value="Снять"/>
+                <input class="card-menu-button" type="submit" th:value="#{button.withdraw}"/>
                 </form>
             </td>
             <td>
                 <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/deposit'}">
-                    <input class="card-menu-button" type="submit" value="Пополнить"/>
+                    <input class="card-menu-button" type="submit" th:value="#{button.deposit}"/>
                 </form>
             </td>
             <td>
                 <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/transfer'}">
-                    <input class="card-menu-button" type="submit" value="Перевод"/>
+                    <input class="card-menu-button" type="submit" th:value="#{button.transfer}"/>
                 </form>
             </td>
         </tr>
         <tr>
             <td>
                 <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/pin'}">
-                    <input class="card-menu-button" type="submit" value="Изменить PIN"/>
+                    <input class="card-menu-button" type="submit" th:value="#{button.changePin}"/>
                 </form>
             </td>
             <td>
                 <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/history'}">
-                    <input class="card-menu-button" type="submit" value="История операций"/>
+                    <input class="card-menu-button" type="submit" th:value="#{button.history}"/>
                 </form>
             </td>
             <td>
                 <form th:method="GET" th:action="@{'/client/card/'+${card.getLastNumbers()}+'/blockConfirmation'}">
-                    <input class="card-menu-button" type="submit" value="Заблокировать"/>
+                    <input class="card-menu-button" type="submit" th:value="#{button.block}"/>
                 </form>
             </td>
         </tr>
@@ -54,13 +54,13 @@
     <table class="bottom-buttons" cellspacing="10">
         <td align="left">
             <form th:action="@{'/client'}" th:method="GET">
-                <button class="button" type="submit">Назад</button>
+                <button class="button" type="submit" th:text="#{button.back}">Back</button>
             </form>
         </td>
 
         <td align="right">
             <form th:action="@{'/logout'}" th:method="POST">
-                <button class="button" type="submit">Завершить обслуживание</button>
+                <button class="button" type="submit" th:text="#{button.exit}">Exit</button>
             </form>
         </td>
     </table>

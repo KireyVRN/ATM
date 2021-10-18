@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.kireev.ATM.services.CardService;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -39,8 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().loginPage("/login")
-                .successHandler(authenticationSuccessHandler()).defaultSuccessUrl("/client")
-                .failureHandler(authenticationFailureHandler()).failureUrl("/loginFailed")
+                .successHandler(authenticationSuccessHandler())
+                .failureHandler(authenticationFailureHandler())
                 .and()
                 .headers().frameOptions().disable()
                 .and()
@@ -91,8 +92,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException {
 
-                httpServletResponse.sendRedirect(httpServletResponse.encodeURL("/login"));
-                LOGGER.error(String.format("Unsuccessful attempt to log in with next data -> card: %s, PIN: %s", httpServletRequest.getParameter("username"), httpServletRequest.getParameter("password")));
+                httpServletResponse.sendRedirect(httpServletResponse.encodeURL("/loginFailed"));
+                LOGGER.warn(String.format("Unsuccessful attempt to log in with next data -> card: %s, PIN: %s", httpServletRequest.getParameter("username"), httpServletRequest.getParameter("password")));
 
             }
         };

@@ -44,6 +44,11 @@ body {
     font-family: Verdana;
     font-size: 25px;
 }
+.langButton {
+    border: 2px solid rgb(225, 255, 255);
+    transition-duration: 0.5s;
+    background-color: rgb(225, 255, 255);
+}
 
 
 /*Text*/

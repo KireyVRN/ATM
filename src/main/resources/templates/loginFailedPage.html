@@ -8,7 +8,7 @@
 <body>
 <div class="screen">
 
-    <p class="message">Неверный номер карты или пин-код</p>
+    <p class="message" th:text="#{message.loginFailed}">Wrong PIN or card number</p>
 
     <div align="center">
         <form th:action="@{'/login'}" th:method="GET">

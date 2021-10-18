@@ -84,6 +84,7 @@ body {
     align: center;
 }
 .card-menu td{
+    width: 33.3%;
     text-align: center;
 }
 

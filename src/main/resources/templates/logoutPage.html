@@ -8,7 +8,7 @@
 <body>
 <div class="screen">
 
-    <p class="message">Спасибо, что пользуетесь услугами нашего банка, не забудьте забрать карту!</p>
+    <p class="message" th:text="#{message.logout}">Thanks for using our bank service</p>
 
     <div align="center">
         <form th:method="GET" th:action="@{'/'}">

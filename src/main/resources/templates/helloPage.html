@@ -2,17 +2,23 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>HelloPage</title>
+    <title> HelloPage </title>
     <link rel="stylesheet" href="/static/styles/atm.css">
 </head>
 <body>
 <div class="screen">
 
-    <p class="message">Пожалуйста вставьте карту</p>
+    <form th:action="${locale}=='en' ? @{/?lang=ru} : @{/?lang=en}" th:method="POST">
+        <button class="langButton" type="submit">
+            <img th:src="${locale}=='en' ? @{/static/images/ru.png} : @{/static/images/en.png}" alt="lang"/>
+        </button>
+    </form>
+
+    <p class="message" th:text="#{message.insertCard}"> Insert card </p>
 
     <div align="center">
         <form th:action="@{'/login'}" th:method="GET">
-            <button class="button" type="submit">Вставить</button>
+            <button class="button" type="submit" th:text="#{button.insert}"> Insert</button>
         </form>
     </div>
 

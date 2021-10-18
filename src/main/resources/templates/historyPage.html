@@ -11,23 +11,30 @@
 
     <div class="date-and-time" id="timeAndDate">Date And Time</div>
 
-    <p class="header">История операций по карте</p>
+    <p class="header" th:text="#{text.history}">History of card operations</p>
 
-        <table class="history">
-            <tr th:each="operation : ${history}">
-                <td th:text="${operation.getInformationForHistory()}">Operation Message</td>
-            </tr>
-        </table>
+    <table class="history">
+        <tr th:each="operation : ${history}">
+            <td th:switch="${operation.getOperationType().toString()}">
+                <span th:case="'DEPOSIT'" th:text="${operation.getDateAndTime()}+' '+#{text.history.deposit}+' '+${operation.getAmountOfMoney()}"> Balance replenishment </span>
+                <span th:case="'WITHDRAW'" th:text="${operation.getDateAndTime()}+' '+#{text.history.withdraw}+' '+${operation.getAmountOfMoney()}"> Cash withdrawal </span>
+                <span th:case="'TRANSFER'"
+                      th:text="${operation.getCard.getCardNumber().equals(operation.getFromCardNumber())} ?
+                      ${operation.getDateAndTime()}+' '+#{text.history.transfer}+' '+${operation.getAmountOfMoney()}+' '+#{text.history.to}+' '+${operation.getToCardNumber()} :
+                      ${operation.getDateAndTime()}+' '+#{text.history.transfer}+' '+${operation.getAmountOfMoney()}+' '+#{text.history.from}+' '+${operation.getFromCardNumber()}"> Money transfer </span>
+            </td>
+        </tr>
+    </table>
 
     <table class="bottom-buttons" cellspacing="10">
         <td align="left">
             <form th:action="@{'/client/card/'+${card.getLastNumbers()}}" th:method="GET">
-                <button class="button" type="submit">Назад</button>
+                <button class="button" type="submit" th:text="#{button.back}">Back</button>
             </form>
         </td>
         <td align="right">
             <form th:action="@{'/logout'}" th:method="POST">
-                <button class="button" type="submit">Завершить обслуживание</button>
+                <button class="button" type="submit" th:text="#{button.exit}">Exit</button>
             </form>
         </td>
     </table>

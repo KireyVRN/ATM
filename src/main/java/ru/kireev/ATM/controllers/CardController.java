@@ -36,7 +36,7 @@ public class CardController {
                 .stream()
                 .filter(c -> c.getLastNumbers().equals(cardLastNumbers))
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Такой карты не существует!"));
+                .orElseThrow(() -> new NoSuchElementException("Card doesn't exist!"));
 
         model.addAttribute("card", card);
         return "cardPage";
@@ -58,7 +58,7 @@ public class CardController {
 
         cardService.blockCard(card);
         boolean currentCard = card.getCardNumber().equals(principal.getName());
-        model.addAttribute("currentCard", currentCard).addAttribute("message", "Карта заблокирована");
+        model.addAttribute("currentCard", currentCard).addAttribute("messageProperty", "message.cardBlock");
         sessionStatus.setComplete();
         return "successfulActionPage";
 
@@ -92,13 +92,13 @@ public class CardController {
         }
 
         operationService.saveOperation(operation
-                .setOperationType(OperationType.WITHDRAWAL)
+                .setOperationType(OperationType.WITHDRAW)
                 .setFromCardNumber(card.getCardNumber())
                 .setDateAndTime(LocalDateTime.now())
                 .setCard(card));
 
         sessionStatus.setComplete();
-        model.addAttribute("message", "Заберите наличные");
+        model.addAttribute("messageProperty", "message.withdraw.success");
         return "successfulActionPage";
 
     }
@@ -131,7 +131,7 @@ public class CardController {
                 .setCard(card));
 
         sessionStatus.setComplete();
-        model.addAttribute("message", "Баланс карты успешно пополнен");
+        model.addAttribute("messageProperty", "message.deposit.success");
         return "successfulActionPage";
 
     }
@@ -180,7 +180,7 @@ public class CardController {
                 .setCard(cardTo));
 
         sessionStatus.setComplete();
-        model.addAttribute("message", String.format("Перевод на имя \"%s %s\" успешно выполнен", cardTo.getClient().getName(), cardTo.getClient().getSurname()));
+        model.addAttribute("messageProperty", "message.transfer.success");
         return "successfulActionPage";
 
     }
@@ -210,7 +210,7 @@ public class CardController {
             return "changePinPage";
         }
 
-        model.addAttribute("message", "Пин-код изменен");
+        model.addAttribute("messageProperty", "message.pinChange.success");
         return "successfulActionPage";
 
     }
@@ -222,4 +222,5 @@ public class CardController {
         return "historyPage";
 
     }
+
 }

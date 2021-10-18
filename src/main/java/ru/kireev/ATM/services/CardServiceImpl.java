@@ -31,7 +31,7 @@ public class CardServiceImpl implements CardService {
 
         return cardRepository
                 .findByCardNumber(cardNumber)
-                .orElseThrow(() -> new NoSuchElementException("Карты " + cardNumber + " не существует!"));
+                .orElseThrow(() -> new NoSuchElementException("Card " + cardNumber + " doesn't exist!"));
 
     }
 
@@ -41,17 +41,17 @@ public class CardServiceImpl implements CardService {
         if (cardFrom.getCardNumber().equals(cardToNumber)) {
 
             LOGGER.warn(String.format("Attempt to transfer money to the same card %s", cardFrom.getCardNumber()));
-            throw new IllegalArgumentException("С этой карты производится текущая операция, введите номер другой карты");
+            throw new IllegalArgumentException("error.currentCard");
 
         } else if (cardRepository.findByCardNumber(cardToNumber).isEmpty()) {
 
             LOGGER.warn(String.format("Attempt to transfer money(%s) from card %s to not existing card %s", amountOfMoney, cardFrom.getCardNumber(), cardToNumber));
-            throw new NoSuchElementException("Такой карты не существует");
+            throw new NoSuchElementException("error.noCard");
 
         } else if (!cardFrom.hasEnoughMoney(amountOfMoney)) {
 
             LOGGER.warn(String.format("Attempt to transfer too much money(%s) from card %s", amountOfMoney, cardFrom.getCardNumber()));
-            throw new IllegalArgumentException("На карте недостаточно средств");
+            throw new IllegalArgumentException("error.notEnoughMoney");
 
         } else {
 
@@ -95,7 +95,7 @@ public class CardServiceImpl implements CardService {
             LOGGER.info(String.format("Money %s was withdrawn from card %s", amountOfMoney, card.getCardNumber()));
         } else {
             LOGGER.warn(String.format("Attempt to withdraw too much money(%s) from card %s", amountOfMoney, card.getCardNumber()));
-            throw new IllegalArgumentException("На карте недостаточно средств");
+            throw new IllegalArgumentException("error.notEnoughMoney");
         }
 
     }
@@ -105,7 +105,7 @@ public class CardServiceImpl implements CardService {
 
         if (!card.getPin().matches("\\d{4}")) {
             LOGGER.warn(String.format("Attempt to change PIN to an incorrect one on card %s", card.getCardNumber()));
-            throw new IllegalArgumentException("Пин-код должен состоять из 4 цифр");
+            throw new IllegalArgumentException("error.incorrectPin");
         } else {
             cardRepository
                     .getById(card.getId())
@@ -118,7 +118,7 @@ public class CardServiceImpl implements CardService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String cardNumber) throws UsernameNotFoundException {
 
-        Card authorizationCard = cardRepository.findByCardNumber(cardNumber).orElseThrow(() -> new UsernameNotFoundException("Пользователя не существует"));
+        Card authorizationCard = cardRepository.findByCardNumber(cardNumber).orElseThrow(() -> new UsernameNotFoundException("User doesn't exist"));
 
         return new User(String.valueOf(authorizationCard.getCardNumber()), authorizationCard.getPin(), authorizationCard.getRoles()
                 .stream()

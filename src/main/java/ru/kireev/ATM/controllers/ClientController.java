@@ -27,7 +27,7 @@ public class ClientController {
 
         Card card = cardService.getCardByNumber(principal.getName());
         Client client = card.getClient();
-        model.addAttribute("client", client).addAttribute("helloMessage", helloMessage(client));
+        model.addAttribute("client", client).addAttribute("partOfDay", getPartOfDayProperty());
         return "clientPage";
 
     }
@@ -46,17 +46,17 @@ public class ClientController {
 
     }
 
-    private String helloMessage(Client client) {
+    private String getPartOfDayProperty() {
 
         int currentHour = LocalTime.now().getHour();
         String partOfDay;
 
-        if (currentHour > 5 && currentHour <= 11) partOfDay = "Доброе утро";
-        else if (currentHour > 11 && currentHour <= 17) partOfDay = "Добрый день";
-        else if (currentHour > 17 && currentHour <= 23) partOfDay = "Добрый вечер";
-        else partOfDay = "Доброй ночи";
+        if (currentHour > 5 && currentHour <= 11) partOfDay = "morning";
+        else if (currentHour > 11 && currentHour <= 17) partOfDay = "day";
+        else if (currentHour > 17 && currentHour <= 23) partOfDay = "evening";
+        else partOfDay = "night";
 
-        return String.format("%s, %s %s!", partOfDay, client.getName(), client.getSurname());
+        return String.format("message.greeting.%s", partOfDay);
 
     }
 
